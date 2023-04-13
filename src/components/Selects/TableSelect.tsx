@@ -12,8 +12,12 @@ interface Props {
 
 export const TableSelect = ({ onChange, value, options }: Props) => {
   const styles = useStyleConfig("ValidationStep") as typeof themeOverrides["components"]["ValidationStep"]["baseStyle"]
+  {console.log("In TABLE SELECT")}
+
   return (
+
     <Select<SelectOption, false>
+
       autoFocus
       size="sm"
       value={value}

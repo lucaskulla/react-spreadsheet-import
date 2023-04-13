@@ -1,7 +1,17 @@
 import type { RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
+import { useState } from "react";
 
-const fields = [
+
+//Idee: fields in eine DB schreiben 
+
+
+
+
+//const [fields, setFields] = useState<any>();
+
+
+let fields =  [
   {
     label: "Name",
     key: "name",
@@ -80,11 +90,20 @@ const fields = [
     },
     example: "true",
   },
-] as const
+  {
+    label: "AddOptionAsYouLike",
+    key: "add",
+    fieldType: {
+      type: "AddOption",
+    },
+  },
+]  
+
 
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
-export const mockRsiValues = mockComponentBehaviourForTypes({
+export  const mockRsiValues = mockComponentBehaviourForTypes(
+  {
   ...defaultRSIProps,
   fields: fields,
   onSubmit: (data) => {
@@ -92,35 +111,35 @@ export const mockRsiValues = mockComponentBehaviourForTypes({
   },
   isOpen: true,
   onClose: () => {},
-  // uploadStepHook: async (data) => {
-  //   await new Promise((resolve) => {
-  //     setTimeout(() => resolve(data), 4000)
-  //   })
-  //   return data
-  // },
-  // selectHeaderStepHook: async (hData, data) => {
-  //   await new Promise((resolve) => {
-  //     setTimeout(
-  //       () =>
-  //         resolve({
-  //           headerValues: hData,
-  //           data,
-  //         }),
-  //       4000,
-  //     )
-  //   })
-  //   return {
-  //     headerValues: hData,
-  //     data,
-  //   }
-  // },
-  // // Runs after column matching and on entry change, more performant
-  // matchColumnsStepHook: async (data) => {
-  //   await new Promise((resolve) => {
-  //     setTimeout(() => resolve(data), 4000)
-  //   })
-  //   return data
-  // },
+  uploadStepHook: async (data) => {
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(data), 4000)
+    })
+    return data
+  },
+  selectHeaderStepHook: async (hData, data) => {
+    await new Promise((resolve) => {
+      setTimeout(
+        () =>
+          resolve({
+            headerValues: hData,
+            data,
+          }),
+        4000,
+      )
+    })
+    return {
+      headerValues: hData,
+      data,
+    }
+  },
+  // Runs after column matching and on entry change, more performant
+  matchColumnsStepHook: async (data) => {
+    await new Promise((resolve) => {
+      setTimeout(() => resolve(data), 4000)
+    })
+    return data
+  },
 })
 
 export const editableTableInitialData = [

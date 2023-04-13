@@ -30,6 +30,7 @@ export const translations = {
     selectPlaceholder: "Select column...",
     ignoredColumnText: "Column ignored",
     subSelectPlaceholder: "Select...",
+    addPlaceholder: "Add...",
     matchDropdownTitle: "Match",
     unmatched: "Unmatched",
     duplicateColumnWarningTitle: "Another column unselected",

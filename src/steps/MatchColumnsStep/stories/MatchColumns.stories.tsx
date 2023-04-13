@@ -5,7 +5,7 @@ import { mockRsiValues } from "../../../stories/mockRsiValues"
 import { ModalWrapper } from "../../../components/ModalWrapper"
 
 export default {
-  title: "Match Columns Steps",
+  title: "Match Columns Steps", //LK: für Storybook notwending
   parameters: {
     layout: "fullscreen",
   },
@@ -13,7 +13,7 @@ export default {
 
 const mockData = [
   ["id", "first_name", "last_name", "email", "gender", "ip_address"],
-  ["2", "Geno", "Gencke", "ggencke0@tinypic.com", "Female", "17.204.180.40"],
+  ["2", "Geno", "Gencke", "ggencke0@tinypic.com", "Female", "17.204.180.41"],
   ["3", "Bertram", "Twyford", "btwyford1@seattletimes.com", "Genderqueer", "188.98.2.13"],
   ["4", "Tersina", "Isacke", "tisacke2@edublogs.org", "Non-binary", "237.69.180.31"],
   ["5", "Yoko", "Guilliland", "yguilliland3@elegantthemes.com", "Male", "179.123.237.119"],

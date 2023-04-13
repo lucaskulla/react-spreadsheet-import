@@ -6,6 +6,7 @@ import { useRsi } from "../hooks/useRsi"
 
 const CheckIcon = ({ color }: { color: string }) => <CgCheck size="2.25rem" color={color} />
 
+//definiere wie der logische Ablauf ist. 
 const steps = ["uploadStep", "selectHeaderStep", "matchColumnsStep", "validationStep"] as const
 
 export const Steps = () => {

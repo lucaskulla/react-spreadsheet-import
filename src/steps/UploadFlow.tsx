@@ -39,7 +39,7 @@ export type StepState =
       type: StepType.validateData
       data: any[]
     }
-
+//LK: definiert wie der Flow ist!!!
 interface Props {
   nextStep: () => void
 }

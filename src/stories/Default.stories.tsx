@@ -10,7 +10,7 @@ export default {
 export const Basic = () => {
   const [data, setData] = useState<any>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
-  return (
+  return ( //LK: startet den kompletten Flow, so wie wenn man das erste mal drauf geht. 
     <>
       <Box py={20} display="flex" gap="8px" alignItems="center">
         <Button onClick={onOpen} border="2px solid #7069FA" p="8px" borderRadius="8px">
@@ -22,9 +22,9 @@ export const Basic = () => {
         Download example file
       </Link>
       <ReactSpreadsheetImport {...mockRsiValues} isOpen={isOpen} onClose={onClose} onSubmit={setData} />
-      {data && (
+      {data && ( //Design wie die Daten am Ende aussehen 
         <Box pt={64} display="flex" gap="8px" flexDirection="column">
-          <b>Returned data:</b>
+          <b>Returned data:</b> 
           <Code
             display="flex"
             alignItems="center"

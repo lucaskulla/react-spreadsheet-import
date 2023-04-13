@@ -12,7 +12,7 @@ export type RsiProps<T extends string> = {
   // Field description for requested data
   fields: Fields<T>
   // Runs after file upload step, receives and returns raw sheet data
-  uploadStepHook?: (data: RawData[]) => Promise<RawData[]>
+  uploadStepHook?: (data: RawData[]) => Promise<RawData[]>  //recreate fields object
   // Runs after header selection step, receives and returns raw sheet data
   selectHeaderStepHook?: (headerValues: RawData, data: RawData[]) => Promise<{ headerValues: RawData; data: RawData[] }>
   // Runs once before validation step, used for data mutations and if you want to change how columns were matched
@@ -45,6 +45,7 @@ export type RsiProps<T extends string> = {
   parseRaw?: boolean
   // Use for right-to-left (RTL) support
   rtl?: boolean
+
 }
 
 export type RawData = Array<string | undefined>
@@ -52,7 +53,7 @@ export type RawData = Array<string | undefined>
 export type Data<T extends string> = { [key in T]: string | boolean | undefined }
 
 // Data model RSI uses for spreadsheet imports
-export type Fields<T extends string> = DeepReadonly<Field<T>[]>
+export type Fields<T extends string> = Field<T> // changed from DeepReadonly<Field<T>[]>
 
 export type Field<T extends string> = {
   // UI-facing field label
@@ -66,7 +67,7 @@ export type Field<T extends string> = {
   // Validations used for field entries
   validations?: Validation[]
   // Field entry component, default: Input
-  fieldType: Checkbox | Select | Input
+  fieldType: Checkbox | Select | Input | AddOption
   // UI-facing values shown to user as field examples pre-upload phase
   example?: string
 }
@@ -83,11 +84,18 @@ export type Select = {
   options: SelectOption[]
 }
 
-export type SelectOption = {
+export type SelectOption = { //LK: um z.B. Team 1 und Team 2 zu nutzen. 
   // UI-facing option label
   label: string
   // Field entry matching criteria as well as select output
   value: string
+}
+
+
+export type AddOption = {
+  //label: string
+  value: string
+  type: "addOption"
 }
 
 export type Input = {

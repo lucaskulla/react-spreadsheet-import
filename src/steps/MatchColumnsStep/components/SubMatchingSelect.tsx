@@ -1,13 +1,13 @@
 import { Box, Text, useStyleConfig } from "@chakra-ui/react"
-import { MatchColumnSelect } from "../../../components/Selects/MatchColumnSelect"
+import { AddColumn, MatchColumnSelect } from "../../../components/Selects/MatchColumnSelect"
 import { getFieldOptions } from "../utils/getFieldOptions"
 import { useRsi } from "../../../hooks/useRsi"
-import type { MatchedOptions, MatchedSelectColumn, MatchedSelectOptionsColumn } from "../MatchColumnsStep"
+import type { AddSelectColumn, MatchedOptions, MatchedSelectColumn, MatchedSelectOptionsColumn } from "../MatchColumnsStep"
 import type { Styles } from "./ColumnGrid"
 
 interface Props<T> {
   option: MatchedOptions<T> | Partial<MatchedOptions<T>>
-  column: MatchedSelectColumn<T> | MatchedSelectOptionsColumn<T>
+  column: MatchedSelectColumn<T> | MatchedSelectOptionsColumn<T> | AddSelectColumn<T>
   onSubChange: (val: T, index: number, option: string) => void
 }
 

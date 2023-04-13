@@ -26,6 +26,7 @@ export enum ColumnType {
   matchedCheckbox,
   matchedSelect,
   matchedSelectOptions,
+  addSelectOption
 }
 
 export type MatchedOptions<T> = {
@@ -33,10 +34,17 @@ export type MatchedOptions<T> = {
   value: T
 }
 
+export type InputOptions<T>={
+  entry: string
+  inputValue: T
+}
+
+
 type EmptyColumn = { type: ColumnType.empty; index: number; header: string }
 type IgnoredColumn = { type: ColumnType.ignored; index: number; header: string }
 type MatchedColumn<T> = { type: ColumnType.matched; index: number; header: string; value: T }
 type MatchedSwitchColumn<T> = { type: ColumnType.matchedCheckbox; index: number; header: string; value: T }
+
 export type MatchedSelectColumn<T> = {
   type: ColumnType.matchedSelect
   index: number
@@ -52,6 +60,16 @@ export type MatchedSelectOptionsColumn<T> = {
   matchedOptions: MatchedOptions<T>[]
 }
 
+export type AddSelectColumn<T> = {
+  //entry: string | undefined
+  type: ColumnType.addSelectOption
+  index: number
+  header: string
+  value: T
+  //matchedOptions: Partial<MatchedOptions<T>>[]
+  matchedOptions: MatchedOptions<T>
+}
+
 export type Column<T extends string> =
   | EmptyColumn
   | IgnoredColumn
@@ -59,6 +77,7 @@ export type Column<T extends string> =
   | MatchedSwitchColumn<T>
   | MatchedSelectColumn<T>
   | MatchedSelectOptionsColumn<T>
+  | AddSelectColumn<T>
 
 export type Columns<T extends string> = Column<T>[]
 
