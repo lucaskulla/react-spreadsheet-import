@@ -26,7 +26,7 @@ export enum ColumnType {
   matchedCheckbox,
   matchedSelect,
   matchedSelectOptions,
-  addSelectOption
+  addSelectOption,
 }
 
 export type MatchedOptions<T> = {
@@ -34,11 +34,10 @@ export type MatchedOptions<T> = {
   value: T
 }
 
-export type InputOptions<T>={
+export type InputOptions<T> = {
   entry: string
   inputValue: T
 }
-
 
 type EmptyColumn = { type: ColumnType.empty; index: number; header: string }
 type IgnoredColumn = { type: ColumnType.ignored; index: number; header: string }
@@ -84,13 +83,15 @@ export type Columns<T extends string> = Column<T>[]
 export const MatchColumnsStep = <T extends string>({ data, headerValues, onContinue }: MatchColumnsProps<T>) => {
   const toast = useToast()
   const dataExample = data.slice(0, 2)
-  const { fields, autoMapHeaders, autoMapDistance, translations } = useRsi<T>()
+  const { autoMapHeaders, autoMapDistance, translations } = useRsi<T>() // LK: Hier war eigentlich noch fields drin
   const [isLoading, setIsLoading] = useState(false)
   const [columns, setColumns] = useState<Columns<T>>(
     // Do not remove spread, it indexes empty array elements, otherwise map() skips over them
     ([...headerValues] as string[]).map((value, index) => ({ type: ColumnType.empty, index, header: value ?? "" })),
   )
+  const fields = useRsi<T>().getFields() //LK: Die Daten kommen an!!!
   const [showUnmatchedFieldsAlert, setShowUnmatchedFieldsAlert] = useState(false)
+
 
   const onChange = useCallback(
     (value: T, columnIndex: number) => {

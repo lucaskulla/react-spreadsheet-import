@@ -10,9 +10,13 @@ export type RsiProps<T extends string> = {
   // callback when RSI is closed before final submit
   onClose: () => void
   // Field description for requested data
-  fields: Fields<T>
+  fields?: Fields<T> //ist jetzt optional, mal schauen, ob das klappt!
+  //Set field property
+  setFields: (fields: string) => void //Achtung: man überschreibt jedes mal das gesamte Objekt, besser, wenn man nur die einzelnen Felder überschreibt -> push funktion
+  //Get field property
+  getFields: () => Fields<T>
   // Runs after file upload step, receives and returns raw sheet data
-  uploadStepHook?: (data: RawData[]) => Promise<RawData[]>  //recreate fields object
+  uploadStepHook?: (data: RawData[]) => Promise<RawData[]> //recreate fields object
   // Runs after header selection step, receives and returns raw sheet data
   selectHeaderStepHook?: (headerValues: RawData, data: RawData[]) => Promise<{ headerValues: RawData; data: RawData[] }>
   // Runs once before validation step, used for data mutations and if you want to change how columns were matched
@@ -45,7 +49,6 @@ export type RsiProps<T extends string> = {
   parseRaw?: boolean
   // Use for right-to-left (RTL) support
   rtl?: boolean
-
 }
 
 export type RawData = Array<string | undefined>
@@ -84,13 +87,13 @@ export type Select = {
   options: SelectOption[]
 }
 
-export type SelectOption = { //LK: um z.B. Team 1 und Team 2 zu nutzen. 
+export type SelectOption = {
+  //LK: um z.B. Team 1 und Team 2 zu nutzen.
   // UI-facing option label
   label: string
   // Field entry matching criteria as well as select output
   value: string
 }
-
 
 export type AddOption = {
   //label: string

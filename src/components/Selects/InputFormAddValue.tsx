@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 
 interface Props {
-  onSubmit: (input: string) => void;
+  onSubmit: (input: string) => void
 }
 
 const InputForm = ({ onSubmit }: Props) => {

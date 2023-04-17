@@ -19,13 +19,11 @@ export const setColumn = <T extends string>(
       return { index: oldColumn.index, type: ColumnType.matchedCheckbox, value: field.key, header: oldColumn.header }
     case "input":
       return { index: oldColumn.index, type: ColumnType.matched, value: field.key, header: oldColumn.header }
-    case "addOption": //LK: Hier wird das Column aufgebaut. 
-      console.log("Set colums, in case addOption")
-      console.log("In SetColums: value: " + field.key)
+    case "addOption": //LK: Hier wird das Column aufgebaut.
       return {
         ...oldColumn,
         type: ColumnType.addSelectOption,
-        value: field.key,  //wenn ich hier label hinschreibe, wird das Label zurückgegeben
+        value: field.key, //wenn ich hier label hinschreibe, wird das Label zurückgegeben
         matchedOptions: uniqueEntries(data || [], oldColumn.index),
       }
     default:

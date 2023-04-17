@@ -8,6 +8,7 @@ import {
   Box,
   AccordionPanel,
   useStyleConfig,
+  Button,
 } from "@chakra-ui/react"
 import { useRsi } from "../../../hooks/useRsi"
 import type { Column } from "../MatchColumnsStep"
@@ -20,13 +21,14 @@ import { SubMatchingSelect } from "./SubMatchingSelect"
 import type { Styles } from "./ColumnGrid"
 import { AddValueForColumn } from "./AddLabel"
 import InputForm from "../../../../src/components/Selects/InputFormAddValue"
-import { useState } from "react";
-
+import { useState } from "react"
+import MyModal from "./InputDialog"
 
 const getAccordionTitle = <T extends string>(fields: Fields<T>, column: Column<T>, translations: Translations) => {
   const fieldLabel = fields.find((field) => "value" in column && field.key === column.value)!.label
-  return `${translations.matchColumnsStep.matchDropdownTitle} ${fieldLabel} (${"matchedOptions" in column && column.matchedOptions.length
-    } ${translations.matchColumnsStep.unmatched})`
+  return `${translations.matchColumnsStep.matchDropdownTitle} ${fieldLabel} (${
+    "matchedOptions" in column && column.matchedOptions.length
+  } ${translations.matchColumnsStep.unmatched})`
 }
 
 type TemplateColumnProps<T extends string> = {
@@ -35,27 +37,37 @@ type TemplateColumnProps<T extends string> = {
   column: Column<T>
 }
 
-
-
 export const TemplateColumn = <T extends string>({ column, onChange, onSubChange }: TemplateColumnProps<T>) => {
-  const { translations, fields } = useRsi<T>()
+  const { translations } = useRsi<T>() //removed fields from { fields, translations}
   const styles = useStyleConfig("MatchColumnsStep") as Styles
   const isIgnored = column.type === ColumnType.ignored
-  const isChecked = //LK: wird benötigt um zu ermitteln, ob etwas ausgewählt wurde, um die Checkbox auszufüllen. 
+  const isChecked = //LK: wird benötigt um zu ermitteln, ob etwas ausgewählt wurde, um die Checkbox auszufüllen.
     column.type === ColumnType.matched ||
     column.type === ColumnType.matchedCheckbox ||
     column.type === ColumnType.matchedSelectOptions ||
     column.type === ColumnType.addSelectOption
+  const fields = useRsi<T>().getFields()
   const isSelect = "matchedOptions" in column
   const selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
 
-  let selectValue = selectOptions.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
-  const [savedInput, setSavedInput] = useState("");
-
+  const selectValue = selectOptions.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
+  const [savedInput, setSavedInput] = useState("")
 
   const handleFormSubmit = (inputValue: string) => {
-    setSavedInput(inputValue);
-  };
+    setSavedInput(inputValue)
+  }
+
+  const addValueToFields = (value: string) => {}
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
@@ -63,12 +75,11 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (
         <>
-        {console.log("selectOptions: "+ selectOptions.at(1)?.label)}
           <Flex alignItems="center" minH={10} w="100%">
             <Box flex={1}>
-              <MatchColumnSelect //LK: replace MatchColumnSelect with AddColumn and you can add test :) 
+              <MatchColumnSelect //LK: replace MatchColumnSelect with AddColumn and you can add test :)
                 placeholder={translations.matchColumnsStep.selectPlaceholder}
-                value={selectValue} //LK: Wenn ich hier was veränder, funktioniert select column nicht mehr. 
+                value={selectValue} //LK: Wenn ich hier was veränder, funktioniert select column nicht mehr.
                 onChange={(value) => onChange(value?.value as T, column.index)}
                 options={selectOptions}
                 name={column.header}
@@ -95,14 +106,20 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
                     </Box>
                   </AccordionButton>
                   <Box>
+                    <Box mt={4}>
+                      <Button onClick={handleOpenModal}>Open Modal</Button>
+                      <MyModal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
+                      {useRsi().setFields(savedInput)}
+                    </Box>
+                  </Box>
+                  <Box>
                     <InputForm onSubmit={handleFormSubmit} />
                     {savedInput && (
                       <Box mt={4}>
-                        <p>Your input: {savedInput}</p>
+                        <p>Your input: {savedInput}</p>x{/*{useRsi().setFields(savedInput)}*/}
                       </Box>
                     )}
                   </Box>
-
                 </AccordionItem>
               </Accordion>
             </Flex>

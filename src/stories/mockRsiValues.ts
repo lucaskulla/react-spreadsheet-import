@@ -1,17 +1,13 @@
 import type { RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
-import { useState } from "react";
+import { useState } from "react"
+import type { Field, Fields } from "../types"
 
+//Idee: fields in eine DB schreiben
 
-//Idee: fields in eine DB schreiben 
+//const [fields2, setFieldsState] = useState<Fields<string>>()
 
-
-
-
-//const [fields, setFields] = useState<any>();
-
-
-let fields =  [
+let fields: Fields<string> = [
   {
     label: "Name",
     key: "name",
@@ -94,17 +90,50 @@ let fields =  [
     label: "AddOptionAsYouLike",
     key: "add",
     fieldType: {
-      type: "AddOption",
+      type: "addOption",
+      value: "addOptionValue",
     },
   },
-]  
-
+]
 
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
-export  const mockRsiValues = mockComponentBehaviourForTypes(
-  {
-  ...defaultRSIProps,
+export const mockRsiValues = mockComponentBehaviourForTypes({
+  setFields: (field: string) => {
+    if(fields.find((f) => f.key === field)) {
+      console.log("field already exists")
+    } else {
+      const f: Fields<string> = {
+        label: field,
+        key: field,
+        alternateMatches: ["alternative"],
+        fieldType: {
+          type: "input",
+        },
+        example: "McDonald",
+        validations: [
+          {
+            rule: "unique",
+            errorMessage: "Last name must be unique",
+            level: "info",
+          },
+        ],
+        description: "Family / Last name",
+      }
+      console.log("fields before concat: ", fields)
+      fields = fields.concat(f)
+      console.log("fields after concat: ", fields)
+    }
+
+
+
+  },
+  getFields: () => {
+    return fields
+  },
+
+  //fields: getField(),
+  ...defaultRSIProps, //LK: ohne geht Storybook "MatchColumnsStep" nicht
   fields: fields,
   onSubmit: (data) => {
     console.log(data.all.map((value) => value))

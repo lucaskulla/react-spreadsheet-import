@@ -1,5 +1,5 @@
 import { Box, Text, useStyleConfig } from "@chakra-ui/react"
-import {  AddColumn } from "../../../components/Selects/MatchColumnSelect"
+import { AddColumn } from "../../../components/Selects/MatchColumnSelect"
 import { getFieldOptions } from "../utils/getFieldOptions"
 import { useRsi } from "../../../hooks/useRsi"
 import type { AddSelectColumn, InputOptions, MatchedOptions, MatchedSelectColumn, MatchedSelectOptionsColumn } from "../MatchColumnsStep"
@@ -7,7 +7,7 @@ import type { Styles } from "./ColumnGrid"
 
 interface Props<T> {
   option: MatchedOptions<T>
-  column:  AddSelectColumn<T> | MatchedSelectColumn<T> | MatchedSelectOptionsColumn<T> //MatchSelect und Option wird benötigt, da über das Template "theoretishc" alles kommen kann...
+  column: AddSelectColumn<T> | MatchedSelectColumn<T> | MatchedSelectOptionsColumn<T> //MatchSelect und Option wird benötigt, da über das Template "theoretishc" alles kommen kann...
   onSubChange: (val: T, index: number, option: string) => void
 }
 
