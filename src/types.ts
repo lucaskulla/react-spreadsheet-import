@@ -1,5 +1,4 @@
 import type { Meta } from "./steps/ValidationStep/types"
-import type { DeepReadonly } from "ts-essentials"
 import type { TranslationsRSIProps } from "./translationsRSIProps"
 import type { Columns } from "./steps/MatchColumnsStep/MatchColumnsStep"
 import type { StepState } from "./steps/UploadFlow"
@@ -56,7 +55,7 @@ export type RawData = Array<string | undefined>
 export type Data<T extends string> = { [key in T]: string | boolean | undefined }
 
 // Data model RSI uses for spreadsheet imports
-export type Fields<T extends string> = Field<T> // changed from DeepReadonly<Field<T>[]>
+export type Fields<T extends string> = Field<T>[] // changed from DeepReadonly<Field<T>[]>
 
 export type Field<T extends string> = {
   // UI-facing field label
@@ -70,7 +69,7 @@ export type Field<T extends string> = {
   // Validations used for field entries
   validations?: Validation[]
   // Field entry component, default: Input
-  fieldType: Checkbox | Select | Input | AddOption
+  fieldType: Checkbox | Select | Input
   // UI-facing values shown to user as field examples pre-upload phase
   example?: string
 }
@@ -93,12 +92,6 @@ export type SelectOption = {
   label: string
   // Field entry matching criteria as well as select output
   value: string
-}
-
-export type AddOption = {
-  //label: string
-  value: string
-  type: "addOption"
 }
 
 export type Input = {

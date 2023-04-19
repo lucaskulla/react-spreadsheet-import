@@ -1,7 +1,5 @@
-import type { RsiProps } from "../types"
+import type { Fields, RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
-import { useState } from "react"
-import type { Field, Fields } from "../types"
 
 //Idee: fields in eine DB schreiben
 
@@ -86,22 +84,16 @@ let fields: Fields<string> = [
     },
     example: "true",
   },
-  {
-    label: "AddOptionAsYouLike",
-    key: "add",
-    fieldType: {
-      type: "addOption",
-      value: "addOptionValue",
-    },
-  },
 ]
 
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
 export const mockRsiValues = mockComponentBehaviourForTypes({
   setFields: (field: string) => {
-    if(fields.find((f) => f.key === field)) {
+    if (fields.find((f) => f.key === field)) {
       console.log("field already exists")
+    } else if (field === "") {
+      console.log("field is empty")
     } else {
       const f: Fields<string> = {
         label: field,
@@ -124,9 +116,6 @@ export const mockRsiValues = mockComponentBehaviourForTypes({
       fields = fields.concat(f)
       console.log("fields after concat: ", fields)
     }
-
-
-
   },
   getFields: () => {
     return fields

@@ -26,7 +26,6 @@ export enum ColumnType {
   matchedCheckbox,
   matchedSelect,
   matchedSelectOptions,
-  addSelectOption,
 }
 
 export type MatchedOptions<T> = {
@@ -59,16 +58,6 @@ export type MatchedSelectOptionsColumn<T> = {
   matchedOptions: MatchedOptions<T>[]
 }
 
-export type AddSelectColumn<T> = {
-  //entry: string | undefined
-  type: ColumnType.addSelectOption
-  index: number
-  header: string
-  value: T
-  //matchedOptions: Partial<MatchedOptions<T>>[]
-  matchedOptions: MatchedOptions<T>
-}
-
 export type Column<T extends string> =
   | EmptyColumn
   | IgnoredColumn
@@ -76,7 +65,6 @@ export type Column<T extends string> =
   | MatchedSwitchColumn<T>
   | MatchedSelectColumn<T>
   | MatchedSelectOptionsColumn<T>
-  | AddSelectColumn<T>
 
 export type Columns<T extends string> = Column<T>[]
 
@@ -91,7 +79,6 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
   )
   const fields = useRsi<T>().getFields() //LK: Die Daten kommen an!!!
   const [showUnmatchedFieldsAlert, setShowUnmatchedFieldsAlert] = useState(false)
-
 
   const onChange = useCallback(
     (value: T, columnIndex: number) => {
