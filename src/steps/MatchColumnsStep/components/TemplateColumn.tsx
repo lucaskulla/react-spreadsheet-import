@@ -15,14 +15,14 @@ import { useRsi } from "../../../hooks/useRsi"
 import type { Column } from "../MatchColumnsStep"
 import { ColumnType } from "../MatchColumnsStep"
 import { MatchIcon } from "./MatchIcon"
-import type { Fields } from "../../../types"
+import type { Field, Fields } from "../../../types"
 import type { Translations } from "../../../translationsRSIProps"
 import { MatchColumnSelect } from "../../../components/Selects/MatchColumnSelect"
 import type { Styles } from "./ColumnGrid"
 import React, { useState } from "react"
-import AddIcon from "./AddIcon"
 import { SubMatchingSelect } from "./SubMatchingSelect"
 import MyModal from "./InputDialog"
+import { EditOrAddIcon } from "./AddEditIcon"
 
 const getAccordionTitle = <T extends string>(fields: Fields<T>, column: Column<T>, translations: Translations) => {
   const fieldLabel = fields.find((field) => "value" in column && field.key === column.value)!.label
@@ -50,10 +50,20 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
   const selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
 
   const selectValue = selectOptions.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
-  const [savedInput, setSavedInput] = useState("")
+  const [savedInput, setSavedInput] = useState<Field<string>>({
+    alternateMatches: [],
+    description: "",
+    example: "",
+    fieldType: {
+      type: "input",
+    },
+    key: "",
+    label: "",
+    validations: [],
+  })
 
-  const handleFormSubmit = (inputValue: FormData) => {
-    setSavedInput(inputValue["label"])
+  const handleFormSubmit = (inputValue: Field<string>) => {
+    setSavedInput(inputValue)
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -83,11 +93,22 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
               />
             </Box>
             <MatchIcon isChecked={isChecked} />
-            <Tooltip label="Add a field" aria-label="A tooltip">
-              <Button leftIcon={<AddIcon />} variant="light" onClick={handleOpenModal} boxSize={1}></Button>
+            <Tooltip label={!isChecked ? "Add a field" : "Edit Text"} aria-label="A tooltip">
+              <Button
+                leftIcon={<EditOrAddIcon isEdit={isChecked} />}
+                variant="light"
+                onClick={handleOpenModal}
+                boxSize={1}
+              ></Button>
             </Tooltip>
             <Box>
-              <MyModal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
+              <MyModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSubmit={handleFormSubmit}
+                isChecked={isChecked}
+                column={column}
+              />
               {useRsi().setFields(savedInput)}
             </Box>
           </Flex>

@@ -1,4 +1,4 @@
-import type { Fields, RsiProps } from "../types"
+import type { Field, Fields, RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
 
 //Idee: fields in eine DB schreiben
@@ -89,36 +89,35 @@ let fields: Fields<string> = [
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
 export const mockRsiValues = mockComponentBehaviourForTypes({
-  setFields: (field: string) => {
-    if (fields.find((f) => f.key === field)) {
-      console.log("field already exists")
-    } else if (field === "") {
+  setFields: (field: Field<string>) => {
+    console.log("setFields2")
+    console.log(field)
+    if (field.key === undefined || field.key === "") {
       console.log("field is empty")
+      return null
     } else {
-      const f: Fields<string> = {
-        label: field,
-        key: field,
-        alternateMatches: ["alternative"],
-        fieldType: {
-          type: "input",
-        },
-        example: "McDonald",
-        validations: [
-          {
-            rule: "unique",
-            errorMessage: "Last name must be unique",
-            level: "info",
-          },
-        ],
-        description: "Family / Last name",
+      const index = fields.findIndex((f) => f.key === field.key)
+      if (index === -1) {
+        //Field does not exist yet -> new entry
+        fields = fields.concat(field)
+      } else {
+        console.log("field already exists")
+        //Field already exists -> update entry
+        fields[index] = field
       }
-      console.log("fields before concat: ", fields)
-      fields = fields.concat(f)
-      console.log("fields after concat: ", fields)
     }
   },
+
   getFields: () => {
     return fields
+  },
+
+  getSpecificField: (field: string) => {
+    if (field === undefined || field === "") {
+      return null
+    } else {
+      return fields.find((f) => f.key === field)
+    }
   },
 
   //fields: getField(),

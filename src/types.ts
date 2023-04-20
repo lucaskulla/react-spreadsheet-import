@@ -10,10 +10,12 @@ export type RsiProps<T extends string> = {
   onClose: () => void
   // Field description for requested data
   fields?: Fields<T> //ist jetzt optional, mal schauen, ob das klappt!
-  //Set field property
-  setFields: (fields: string) => void //Achtung: man überschreibt jedes mal das gesamte Objekt, besser, wenn man nur die einzelnen Felder überschreibt -> push funktion
+  //Set field property -> ACHTUNG: Man darf nicht den KEY ändern. Das führt zu Problemen!
+  setFields: (fields: Field<string>) => void
   //Get field property
   getFields: () => Fields<T>
+  //Get specific field property
+  getSpecificField: (f: string) => Field<T>
   // Runs after file upload step, receives and returns raw sheet data
   uploadStepHook?: (data: RawData[]) => Promise<RawData[]> //recreate fields object
   // Runs after header selection step, receives and returns raw sheet data

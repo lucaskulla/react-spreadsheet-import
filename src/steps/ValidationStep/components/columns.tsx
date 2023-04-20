@@ -135,7 +135,6 @@ export const generateColumns = <T extends string>(fields: Fields<T>): Column<Dat
             component = (
               <Box minWidth="100%" minHeight="100%" overflow="hidden" textOverflow="ellipsis">
                 {row[column.key as T]}
-                {console.log("In Columns Case AddOption Z.138")}
               </Box>
             )
             break
