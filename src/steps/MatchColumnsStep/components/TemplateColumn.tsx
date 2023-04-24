@@ -76,8 +76,40 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
     setIsModalOpen(false)
   }
 
+  const addMissingFieldsFromHeader = (fields: Fields<string>) => {
+    const header = column.header // beinhaltet jeweils einen Wert aus dem Header
+    if (fields === undefined) {
+      return null
+    } else {
+      const key = fields.find((f) => f.key === header)
+      if (key === undefined) {
+        //Field exisitiert noch nciht.
+
+        const fieldToAdd: Field<string> = {
+          alternateMatches: [header],
+          description: "This field element is automatically generated",
+          example: "",
+          fieldType: {
+            type: "input",
+          },
+          key: header,
+          label: header,
+          validations: [],
+        }
+        console.log("The field with the key: " + key + " was added")
+        console.log(fieldToAdd)
+        console.log("Ende FieldAdd Method")
+        useRsi().setFields(fieldToAdd)
+      } else {
+        // do nothing, key exists.
+      }
+    }
+  }
+
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
+      {addMissingFieldsFromHeader(useRsi().getFields())}
+
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (

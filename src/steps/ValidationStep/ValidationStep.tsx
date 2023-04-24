@@ -59,7 +59,7 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
     [data, updateData],
   )
 
-  const columns = useMemo(() => generateColumns(fields), [fields])
+  const columns = useMemo(() => generateColumns(useRsi().getFields()), [fields])
 
   const tableData = useMemo(() => {
     if (filterByErrors) {

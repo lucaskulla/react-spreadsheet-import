@@ -131,13 +131,6 @@ export const generateColumns = <T extends string>(fields: Fields<T>): Column<Dat
               </Box>
             )
             break
-          case "addOption":
-            component = (
-              <Box minWidth="100%" minHeight="100%" overflow="hidden" textOverflow="ellipsis">
-                {row[column.key as T]}
-              </Box>
-            )
-            break
           default:
             component = (
               <Box minWidth="100%" minHeight="100%" overflow="hidden" textOverflow="ellipsis">

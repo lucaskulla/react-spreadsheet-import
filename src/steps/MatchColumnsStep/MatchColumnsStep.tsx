@@ -163,7 +163,7 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
       setColumns(getMatchedColumns(columns, fields, data, autoMapDistance))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fields])
 
   return (
     <>

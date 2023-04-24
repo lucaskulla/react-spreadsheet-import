@@ -1,15 +1,11 @@
 import type { Field, Fields, RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
 
-//Idee: fields in eine DB schreiben
-
-//const [fields2, setFieldsState] = useState<Fields<string>>()
-
 let fields: Fields<string> = [
   {
     label: "Name",
     key: "name",
-    alternateMatches: ["first name", "first"],
+    alternateMatches: ["first l", "first"],
     fieldType: {
       type: "input",
     },
@@ -90,8 +86,6 @@ const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) =>
 
 export const mockRsiValues = mockComponentBehaviourForTypes({
   setFields: (field: Field<string>) => {
-    console.log("setFields2")
-    console.log(field)
     if (field.key === undefined || field.key === "") {
       console.log("field is empty")
       return null
@@ -109,6 +103,8 @@ export const mockRsiValues = mockComponentBehaviourForTypes({
   },
 
   getFields: () => {
+    //Wenn Fields leer ist -> aus Header erstellen.
+
     return fields
   },
 
