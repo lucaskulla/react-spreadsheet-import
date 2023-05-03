@@ -1,0 +1,35 @@
+{
+  "$id": "https://example.com/person.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "The person's first name.",
+      "examples": ["John"]
+    },
+    "lastName": {
+      "type": "string",
+      "description": "The person's last name.",
+      "examples": ["Doe"]
+    },
+    "age": {
+      "description": "Age in years which must be equal to or greater than zero.",
+      "type": "integer",
+      "minimum": 0,
+      "examples": [25]
+    },
+    "email": {
+      "description": "Email address of the user",
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "description": "Phone number of the user",
+      "type": "string",
+      "pattern": "^(\\d{3})-(\\d{3})-(\\d{4})$"
+    }
+  },
+  "required": ["firstName", "lastName", "email"]
+}

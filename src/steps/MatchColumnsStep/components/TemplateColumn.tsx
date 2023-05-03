@@ -23,6 +23,9 @@ import React, { useState } from "react"
 import { SubMatchingSelect } from "./SubMatchingSelect"
 import MyModal from "./InputDialog"
 import { EditOrAddIcon } from "./AddEditIcon"
+import schemaToFields from "../../../utils/schemaToFields"
+import SchemaA from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema1.json"
+import SchemaB from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema2.json"
 
 const getAccordionTitle = <T extends string>(fields: Fields<T>, column: Column<T>, translations: Translations) => {
   const fieldLabel = fields.find((field) => "value" in column && field.key === column.value)!.label
@@ -48,6 +51,7 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
   const fields = useRsi<T>().getFields()
   const isSelect = "matchedOptions" in column
   const selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
+  const [schemaUsed, setSchemaUsed] = useState(false)
 
   const selectValue = selectOptions.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
   const [savedInput, setSavedInput] = useState<Field<string>>({
@@ -77,38 +81,60 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
   }
 
   const addMissingFieldsFromHeader = (fields: Fields<string>) => {
-    const header = column.header // beinhaltet jeweils einen Wert aus dem Header
-    if (fields === undefined) {
-      return null
-    } else {
-      const key = fields.find((f) => f.key === header)
-      if (key === undefined) {
-        //Field exisitiert noch nciht.
-
-        const fieldToAdd: Field<string> = {
-          alternateMatches: [header],
-          description: "This field element is automatically generated",
-          example: "",
-          fieldType: {
-            type: "input",
-          },
-          key: header,
-          label: header,
-          validations: [],
-        }
-        console.log("The field with the key: " + key + " was added")
-        console.log(fieldToAdd)
-        console.log("Ende FieldAdd Method")
-        useRsi().setFields(fieldToAdd)
+    const schemaUsed = localStorage.getItem("schemaUsed")
+    if (schemaUsed === "false") {
+      //IF true, dann hat man schon ein Schema und es werden keine neuen Felder hinzugefügt.
+      const header = column.header // beinhaltet jeweils einen Wert aus dem Header
+      if (fields === undefined) {
+        return null
       } else {
-        // do nothing, key exists.
+        const key = fields.find((f) => f.key === header)
+        if (key === undefined) {
+          //Field exisitiert noch nciht.
+
+          const fieldToAdd: Field<string> = {
+            alternateMatches: [header],
+            description: "This field element is automatically generated",
+            example: "",
+            fieldType: {
+              type: "input",
+            },
+            key: header,
+            label: header,
+            validations: [],
+          }
+          useRsi().setFields(fieldToAdd)
+        } else {
+          // do nothing, key exists.
+        }
       }
+    } else if (schemaUsed === "true") {
+      console.log("User wants to reuse a schema")
+      const schemaToUse = localStorage.getItem("schemaToUse")
+      if (schemaToUse === null) {
+        console.log("No schema to use")
+      } else if (schemaToUse === "A") {
+        console.log("Schema A is used")
+        const fieldA = schemaToFields(SchemaA)
+
+        for (let i = 0; i < fieldA.length; i++) {
+          useRsi().setFields(fieldA[i])
+        }
+      } else if (schemaToUse === "B") {
+        console.log("Schema B is used")
+        const fieldB = schemaToFields(SchemaB)
+        for (let i = 0; i < fieldB.length; i++) {
+          useRsi().setFields(fieldB[i])
+        }
+      }
+    } else {
+      console.log("Problem with schemaUsed")
     }
   }
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
-      {addMissingFieldsFromHeader(useRsi().getFields())}
+      {(() => addMissingFieldsFromHeader(useRsi().getFields()))()}
 
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>

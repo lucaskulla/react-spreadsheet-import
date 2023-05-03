@@ -10,6 +10,10 @@ import { SubmitDataAlert } from "../../components/Alerts/SubmitDataAlert"
 import type { Data } from "../../types"
 import type { themeOverrides } from "../../theme"
 import type { RowsChangeData } from "react-data-grid"
+import Ajv from "ajv"
+import SchemaA from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema1.json"
+
+import { DataIsInvalid } from "../../components/Alerts/DataIsInvalidAlert" // Import the DataIsInvalid component
 
 type Props<T extends string> = {
   initialData: Data<T>[]
@@ -29,6 +33,7 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
   const [selectedRows, setSelectedRows] = useState<ReadonlySet<number | string>>(new Set())
   const [filterByErrors, setFilterByErrors] = useState(false)
   const [showSubmitAlert, setShowSubmitAlert] = useState(false)
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   const updateData = useCallback(
     (rows: typeof data) => {
@@ -74,7 +79,11 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
   }, [data, filterByErrors])
 
   const rowKeyGetter = useCallback((row: Data<T> & Meta) => row.__index, [])
-
+  // New function to handle the alert's confirm action
+  const handleAlertConfirm = () => {
+    setIsAlertOpen(false)
+    onClose()
+  }
   const submitData = () => {
     const all = data.map(({ __index, __errors, ...value }) => ({ ...value })) as unknown as Data<T>[]
     const validData = all.filter((value, index) => {
@@ -85,8 +94,35 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
       return true
     })
     const invalidData = all.filter((value) => !validData.includes(value))
-    onSubmit({ validData, invalidData, all: data })
-    onClose()
+    let hasInvalidData = false
+
+    //Only if schema is used, validation step should be executed
+    if (localStorage.getItem("schema") === "true") {
+      const ajv = new Ajv()
+      const validate = ajv.compile(SchemaA)
+
+      // Validate data against the schema
+
+      for (let i = 0; i < all.length; i++) {
+        const validationResult = validate(all[i])
+        if (!validationResult) {
+          hasInvalidData = true
+          console.error("Validation failed", validate.errors)
+        } else {
+          console.log("Validation passed")
+        }
+      }
+
+      if (hasInvalidData) {
+        setIsAlertOpen(true)
+      } else {
+        onSubmit({ validData, invalidData, all: data })
+        onClose()
+      }
+    } else {
+      onSubmit({ validData, invalidData, all: data })
+      onClose()
+    }
   }
   const onContinue = () => {
     const invalidData = data.find((value) => {
@@ -112,6 +148,7 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
           submitData()
         }}
       />
+      <DataIsInvalid isOpen={isAlertOpen} onClose={() => setIsAlertOpen(false)} onConfirm={handleAlertConfirm} />
       <ModalBody pb={0}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb="2rem" flexWrap="wrap" gap="8px">
           <Heading sx={styles.heading}>{translations.validationStep.title}</Heading>

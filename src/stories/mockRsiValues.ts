@@ -2,6 +2,7 @@ import type { Field, Fields, RsiProps } from "../types"
 import { defaultRSIProps } from "../ReactSpreadsheetImport"
 
 let fields: Fields<string> = []
+let schemaUsed = false
 
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
@@ -23,9 +24,15 @@ export const mockRsiValues = mockComponentBehaviourForTypes({
     }
   },
 
-  getFields: () => {
-    //Wenn Fields leer ist -> aus Header erstellen.
+  setSchemaUsed: (value: boolean) => {
+    schemaUsed = value
+  },
 
+  getSchemaUsed: () => {
+    return schemaUsed
+  },
+
+  getFields: () => {
     return fields
   },
 

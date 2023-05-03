@@ -5,6 +5,7 @@ import { ColumnType } from "../MatchColumnsStep"
 import { dataAttr } from "@chakra-ui/utils"
 import type { Styles } from "./ColumnGrid"
 import type { RawData } from "../../../types"
+import React from "react"
 
 type UserTableColumnProps<T extends string> = {
   column: Column<T>
@@ -22,6 +23,7 @@ export const UserTableColumn = <T extends string>(props: UserTableColumnProps<T>
     onRevertIgnore,
   } = props
   const isIgnored = type === ColumnType.ignored
+
   return (
     <Box>
       <Flex px={6} justifyContent="space-between" alignItems="center" mb={4}>

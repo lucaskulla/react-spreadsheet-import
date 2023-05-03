@@ -16,6 +16,12 @@ export type RsiProps<T extends string> = {
   getFields: () => Fields<T>
   //Get specific field property
   getSpecificField: (f: string) => Field<T>
+
+  //In the beginning user has option to choose between using an exisiting schema or creating a new one
+  //Set if schema is used
+  setSchemaUsed: (value: boolean) => void
+  getSchemaUsed: () => boolean
+
   // Runs after file upload step, receives and returns raw sheet data
   uploadStepHook?: (data: RawData[]) => Promise<RawData[]> //recreate fields object
   // Runs after header selection step, receives and returns raw sheet data
