@@ -19,13 +19,11 @@ import type { Field, Fields } from "../../../types"
 import type { Translations } from "../../../translationsRSIProps"
 import { MatchColumnSelect } from "../../../components/Selects/MatchColumnSelect"
 import type { Styles } from "./ColumnGrid"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { SubMatchingSelect } from "./SubMatchingSelect"
 import MyModal from "./InputDialog"
 import { EditOrAddIcon } from "./AddEditIcon"
-import schemaToFields from "../../../utils/schemaToFields"
-import SchemaA from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema1.json"
-import SchemaB from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema2.json"
+import type { JSONSchema6 } from "json-schema"
 
 const getAccordionTitle = <T extends string>(fields: Fields<T>, column: Column<T>, translations: Translations) => {
   const fieldLabel = fields.find((field) => "value" in column && field.key === column.value)!.label
@@ -38,10 +36,17 @@ type TemplateColumnProps<T extends string> = {
   onChange: (val: T, index: number) => void
   onSubChange: (val: T, index: number, option: string) => void
   column: Column<T>
-  Field: Fields<string>
+  schema: JSONSchema6
+  convertedSchema: Fields<string>
 }
 
-export const TemplateColumn = <T extends string>({ column, onChange, onSubChange }: TemplateColumnProps<T>) => {
+export const TemplateColumn = <T extends string>({
+  column,
+  onChange,
+  onSubChange,
+  schema,
+  convertedSchema,
+}: TemplateColumnProps<T>) => {
   const { translations } = useRsi<T>() //removed fields from { fields, translations}
   const styles = useStyleConfig("MatchColumnsStep") as Styles
   const isIgnored = column.type === ColumnType.ignored
@@ -51,10 +56,11 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
     column.type === ColumnType.matchedSelectOptions
   const fields = useRsi<T>().getFields()
   const isSelect = "matchedOptions" in column
-  const selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
-  const [schemaUsed, setSchemaUsed] = useState(false)
+  //let selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
 
-  const selectValue = selectOptions.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
+  const [selectOption, setSelectOption] = useState<any>(fields.map(({ label, key }) => ({ value: key, label })))
+
+  const selectValue = selectOption.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
   const [savedInput, setSavedInput] = useState<Field<string>>({
     alternateMatches: [],
     description: "",
@@ -66,6 +72,9 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
     label: "",
     validations: [],
   })
+
+  // Add this to the top of your component
+  const [fieldsAdded, setFieldsAdded] = useState(false)
 
   const handleFormSubmit = (inputValue: Field<string>) => {
     setSavedInput(inputValue)
@@ -81,18 +90,19 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
     setIsModalOpen(false)
   }
 
-  const addMissingFieldsFromHeader = (fields: Fields<string>) => {
+  useEffect(() => {
+    setSelectOption(fields.map(({ label, key }) => ({ value: key, label })))
+  }, [fields])
+
+  const addMissingFieldsFromHeader = (fields: Fields<string>, setFieldsFn: (field: Field<string>) => void) => {
     const schemaUsed = localStorage.getItem("schemaUsed")
     if (schemaUsed === "false") {
-      //IF true, dann hat man schon ein Schema und es werden keine neuen Felder hinzugefügt.
-      const header = column.header // beinhaltet jeweils einen Wert aus dem Header
+      const header = column.header
       if (fields === undefined) {
         return null
       } else {
         const key = fields.find((f) => f.key === header)
         if (key === undefined) {
-          //Field exisitiert noch nciht.
-
           const fieldToAdd: Field<string> = {
             alternateMatches: [header],
             description: "This field element is automatically generated",
@@ -104,39 +114,18 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
             label: header,
             validations: [],
           }
-          useRsi().setFields(fieldToAdd)
+          setFieldsFn(fieldToAdd)
         } else {
           // do nothing, key exists.
         }
       }
-    } else if (schemaUsed === "true") {
-      console.log("User wants to reuse a schema")
-      const schemaToUse = localStorage.getItem("schemaToUse")
-      if (schemaToUse === null) {
-        console.log("No schema to use")
-      } else if (schemaToUse === "A") {
-        console.log("Schema A is used")
-        const fieldA = schemaToFields(SchemaA)
-
-        for (let i = 0; i < fieldA.length; i++) {
-          useRsi().setFields(fieldA[i])
-        }
-      } else if (schemaToUse === "B") {
-        console.log("Schema B is used")
-        const fieldB = schemaToFields(SchemaB)
-        for (let i = 0; i < fieldB.length; i++) {
-          useRsi().setFields(fieldB[i])
-        }
-      }
-    } else {
-      console.log("Problem with schemaUsed")
     }
   }
+  const rsiInstance = useRsi()
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
-      {(() => addMissingFieldsFromHeader(useRsi().getFields()))()}
-
+      {(() => addMissingFieldsFromHeader(useRsi().getFields(), useRsi().setFields))()}
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (
@@ -147,7 +136,7 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
                 placeholder={translations.matchColumnsStep.selectPlaceholder}
                 value={selectValue} //LK: Wenn ich hier was veränder, funktioniert select column nicht mehr.
                 onChange={(value) => onChange(value?.value as T, column.index)}
-                options={selectOptions}
+                options={selectOption}
                 name={column.header}
               />
             </Box>

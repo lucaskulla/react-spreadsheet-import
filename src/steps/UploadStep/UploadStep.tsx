@@ -33,7 +33,7 @@ export const UploadStep = ({ onContinue }: UploadProps) => {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const response = await apiClient.get("/schema")
+        const response = await apiClient.get("/schema", { params: { include_version: true } })
         if (Array.isArray(response.data)) {
           setFetchedOptions(response.data.map((item: string) => ({ value: item, label: item })))
         } else {

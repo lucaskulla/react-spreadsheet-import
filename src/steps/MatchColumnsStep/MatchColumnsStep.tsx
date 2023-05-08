@@ -8,10 +8,12 @@ import { setColumn } from "./utils/setColumn"
 import { setIgnoreColumn } from "./utils/setIgnoreColumn"
 import { setSubColumn } from "./utils/setSubColumn"
 import { normalizeTableData } from "./utils/normalizeTableData"
-import type { Field, RawData } from "../../types"
+import type { Field, Fields, RawData } from "../../types"
 import { getMatchedColumns } from "./utils/getMatchedColumns"
 import { UnmatchedFieldsAlert } from "../../components/Alerts/UnmatchedFieldsAlert"
 import { findUnmatchedRequiredFields } from "./utils/findUnmatchedRequiredFields"
+import apiClient from "../../api/apiClient"
+import schemaToFields from "../../utils/schemaToFields"
 
 export type MatchColumnsProps<T extends string> = {
   data: RawData[]
@@ -80,6 +82,8 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
   const fields = useRsi<T>().getFields() //LK: Die Daten kommen an!!!
   const [showUnmatchedFieldsAlert, setShowUnmatchedFieldsAlert] = useState(false)
 
+  const [fetchedSchema, setFetchedSchema] = useState<string>()
+  const [convertedSchema, setConvertedSchema] = useState<Field<string>[]>()
   const onChange = useCallback(
     (value: T, columnIndex: number) => {
       const field = fields.find((field) => field.key === value) as unknown as Field<T>
@@ -165,6 +169,58 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields])
 
+  const [isSchemaFetched, setIsSchemaFetched] = useState(false)
+
+  useEffect(() => {
+    const fetchSchema = async () => {
+      try {
+        const selectedSchema = localStorage.getItem("schemaToUse")
+        if (selectedSchema !== null) {
+          const response = await apiClient.get("/schema/" + selectedSchema)
+          const version = selectedSchema.substring(selectedSchema.lastIndexOf(":") + 1) // "0.0.1"
+          setFetchedSchema(response.data[version])
+          setConvertedSchema(schemaToFields(response.data[version]))
+          setIsSchemaFetched(true)
+        } else {
+          console.log("Schema already fetched")
+        }
+      } catch (error) {
+        console.error("Error fetching options:", error)
+      }
+    }
+    fetchSchema()
+  }, [])
+
+  const addMissingFieldsFromHeader = async (fields: Fields<string>, setFieldsFn: (field: Field<string>) => void) => {
+    const schemaUsed = localStorage.getItem("schemaUsed")
+    if (schemaUsed === "true") {
+      console.log("User wants to reuse a schema")
+      if (convertedSchema === undefined) {
+        console.log("ATTENTION SCHEam is undefined")
+      } else {
+        for (let i = 0; i < convertedSchema.length; i++) {
+          console.log(i)
+          if (convertedSchema) {
+            setFieldsFn(convertedSchema[i])
+            console.log(i)
+          } else {
+            console.log("No schema available - ATTENTION!")
+          }
+        }
+        setFieldsAdded(true)
+      }
+    }
+  }
+  const rsiInstance = useRsi()
+  const [fieldsAdded, setFieldsAdded] = useState(false)
+  useEffect(() => {
+    if (!fieldsAdded && isSchemaFetched) {
+      addMissingFieldsFromHeader(rsiInstance.getFields(), rsiInstance.setFields)
+        .then(() => setFieldsAdded(true))
+        .catch((error) => console.error("Error adding missing fields:", error))
+    }
+  }, [fieldsAdded, isSchemaFetched])
+
   return (
     <>
       <UnmatchedFieldsAlert
@@ -186,7 +242,13 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
           />
         )}
         templateColumn={(column) => (
-          <TemplateColumn column={column} onChange={onChange} onSubChange={onSubChange} /> //field={field} hinzugefügen
+          <TemplateColumn
+            column={column}
+            onChange={onChange}
+            onSubChange={onSubChange}
+            schema={fetchedSchema}
+            convertedSchema={convertedSchema}
+          /> //field={field} hinzugefügen
         )}
       />
     </>

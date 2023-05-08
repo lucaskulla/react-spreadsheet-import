@@ -1,4 +1,4 @@
-import type { Field, Fields, RegexValidation, RequiredValidation, Validation } from "../types"
+import type { Field, RegexValidation, RequiredValidation, Validation } from "../types"
 
 type JSONSchema = {
   [key: string]: any
@@ -85,7 +85,6 @@ function processProperty(key: string, property: JSONSchema, defs: JSONSchema, pr
     const refProperty = refPath.reduce((acc: { [x: string]: any }, curr: string | number) => acc[curr], defs)
     if (refProperty.properties) {
       for (const refKey in refProperty.properties) {
-        console.log(refKey, "refKey", label, "label")
         processProperty(refKey, refProperty.properties[refKey], defs, label)
       }
       return
@@ -146,10 +145,9 @@ function processProperty(key: string, property: JSONSchema, defs: JSONSchema, pr
   fieldsList.push(field)
 }
 
-function jsonSchemaToFields(schema: JSONSchema): Fields<string>[] {
+function jsonSchemaToFields(schema: JSONSchema): Field<string>[] {
   fieldsList = []
   const defs = schema.$defs || {}
-  console.log(defs, "defs")
 
   const properties = schema.properties
 
