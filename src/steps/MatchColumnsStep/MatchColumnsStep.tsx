@@ -185,7 +185,9 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
             entries={dataExample.map((row) => row[column.index])}
           />
         )}
-        templateColumn={(column) => <TemplateColumn column={column} onChange={onChange} onSubChange={onSubChange} />}
+        templateColumn={(column) => (
+          <TemplateColumn column={column} onChange={onChange} onSubChange={onSubChange} /> //field={field} hinzugefügen
+        )}
       />
     </>
   )

@@ -54,8 +54,6 @@ export const Basic = () => {
 
   function handleDownloadButtonClick(fileName: string): void {
     if (data) {
-      console.log(data)
-      console.log(data[fileName])
       downloadCSV(data[fileName], fileName + ".csv")
     } else {
       console.log("Data not avaiable")

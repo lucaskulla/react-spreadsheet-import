@@ -38,6 +38,7 @@ type TemplateColumnProps<T extends string> = {
   onChange: (val: T, index: number) => void
   onSubChange: (val: T, index: number, option: string) => void
   column: Column<T>
+  Field: Fields<string>
 }
 
 export const TemplateColumn = <T extends string>({ column, onChange, onSubChange }: TemplateColumnProps<T>) => {
