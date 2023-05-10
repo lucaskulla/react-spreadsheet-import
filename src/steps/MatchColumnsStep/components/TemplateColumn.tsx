@@ -119,6 +119,7 @@ export const TemplateColumn = <T extends string>({
           // do nothing, key exists.
         }
       }
+      localStorage.setItem("fieldsList", JSON.stringify(useRsi().getFields()))
     }
   }
   const rsiInstance = useRsi()
@@ -126,6 +127,7 @@ export const TemplateColumn = <T extends string>({
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
       {(() => addMissingFieldsFromHeader(useRsi().getFields(), useRsi().setFields))()}
+
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (

@@ -5,6 +5,7 @@ import { useState } from "react"
 import type { Data } from "../types"
 import { saveAs } from "file-saver"
 import fieldsToJsonSchema from "../utils/fieldsToSchema"
+import apiClient from "../api/apiClient"
 
 export default {
   title: "React spreadsheet import",
@@ -63,11 +64,20 @@ export const Basic = () => {
 
   function handleDownloadNewSchema(): void {
     const fields = localStorage.getItem("fieldsList")
+    const schemaUsedStorage = localStorage.getItem("schemaUsed")
+    const schemaUsed: boolean = schemaUsedStorage ? schemaUsedStorage === "true" : false
     if (fields) {
-      const conversion = fieldsToJsonSchema(JSON.parse(fields))
+      const conversion = fieldsToJsonSchema(JSON.parse(fields), schemaUsed)
       console.log(JSON.stringify(conversion, null, 2), "conversion")
-      console.log(JSON.parse(fields), "fields")
+      apiClient.post("/schema", conversion).then((r) => console.log(r))
     }
+  }
+
+  function removeOldStorage(): void {
+    localStorage.removeItem("fieldsList")
+    localStorage.removeItem("fields")
+    localStorage.removeItem("schemaToUse")
+    localStorage.removeItem("schemaUsed")
   }
 
   return (
@@ -75,6 +85,7 @@ export const Basic = () => {
       <Box py={20} display="flex" gap="8px" alignItems="center">
         <Button
           onClick={() => {
+            removeOldStorage()
             onOpen()
           }}
           border="2px solid #7069FA"
@@ -138,7 +149,7 @@ export const Basic = () => {
               _hover={{ bg: "blue.600" }}
               _active={{ bg: "blue.700" }}
             >
-              Download new schema
+              Upload new Schema to API
             </Button>
           </Box>
         </Box>
