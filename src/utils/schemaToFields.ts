@@ -91,7 +91,7 @@ function processProperty(key: string, property: JSONSchema, defs: JSONSchema, pr
     }
   }
 
-  //ATKUELL NICHT GENUTZT
+  /*  //ATKUELL NICHT GENUTZT
   if (property.type === "object" && property.properties) {
     // Recursively process nested properties
     for (const nestedKey in property.properties) {
@@ -105,7 +105,7 @@ function processProperty(key: string, property: JSONSchema, defs: JSONSchema, pr
       }
     }
     return
-  }
+  }*/
 
   if (property.type === "array" && property.items) {
     if (property.items.$ref) {
@@ -157,6 +157,8 @@ function jsonSchemaToFields(schema: JSONSchema): Field<string>[] {
   }
 
   console.log(fieldsList, "fields after processProperty_!_!_!_!_!__!_!_!_!")
+
+  localStorage.setItem("fieldsList", JSON.stringify(fieldsList))
 
   return fieldsList
 }

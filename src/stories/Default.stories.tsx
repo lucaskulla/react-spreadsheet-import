@@ -4,6 +4,7 @@ import { mockRsiValues } from "./mockRsiValues"
 import { useState } from "react"
 import type { Data } from "../types"
 import { saveAs } from "file-saver"
+import fieldsToJsonSchema from "../utils/fieldsToSchema"
 
 export default {
   title: "React spreadsheet import",
@@ -57,6 +58,15 @@ export const Basic = () => {
       downloadCSV(data[fileName], fileName + ".csv")
     } else {
       console.log("Data not avaiable")
+    }
+  }
+
+  function handleDownloadNewSchema(): void {
+    const fields = localStorage.getItem("fieldsList")
+    if (fields) {
+      const conversion = fieldsToJsonSchema(JSON.parse(fields))
+      console.log(JSON.stringify(conversion, null, 2), "conversion")
+      console.log(JSON.parse(fields), "fields")
     }
   }
 
@@ -117,6 +127,18 @@ export const Basic = () => {
               _active={{ bg: "blue.700" }}
             >
               Download Invalid Data
+            </Button>
+            <Button
+              onClick={() => handleDownloadNewSchema()}
+              bg="blue.500"
+              color="black"
+              p="8px"
+              border="2px solid #718096"
+              borderRadius="8px"
+              _hover={{ bg: "blue.600" }}
+              _active={{ bg: "blue.700" }}
+            >
+              Download new schema
             </Button>
           </Box>
         </Box>
