@@ -1,7 +1,6 @@
 import {
   Button,
   FormControl,
-  FormLabel,
   Heading,
   Input,
   Modal,
@@ -11,17 +10,17 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Text,
   Textarea,
   useStyleConfig,
 } from "@chakra-ui/react"
-import Form from "react-jsonschema-form"
+import Form from "@rjsf/core"
 import React from "react"
-import type { JSONSchema6 } from "json-schema"
 import type { themeOverrides } from "../../../theme"
 import type { Column } from "../MatchColumnsStep"
 import { useRsi } from "../../../hooks/useRsi"
 import ReactSelect from "react-select"
+import validator from "@rjsf/validator-ajv8"
+import type { RJSFSchema } from "@rjsf/utils"
 
 interface ModalProps {
   isOpen: boolean
@@ -32,7 +31,7 @@ interface ModalProps {
 }
 
 const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
-  const schemaField: JSONSchema6 = {
+  const schemaField: RJSFSchema = {
     type: "object",
     properties: {
       label: {
@@ -183,7 +182,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
     const { propertyName, onChange, onBlur, onFocus, value } = props
     return (
       <>
-        <Text>{propertyName}</Text>
         <Input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
       </>
     )
@@ -193,7 +191,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
     const { propertyName, onChange, onBlur, onFocus, value } = props
     return (
       <>
-        <Text>{propertyName}</Text>
         <Textarea value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
       </>
     )
@@ -240,7 +237,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
 
     return (
       <FormControl id={id}>
-        <FormLabel>{label}</FormLabel>
         <ReactSelect
           isMulti
           value={selectedOptions}
@@ -274,7 +270,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
 
     return (
       <FormControl id={id}>
-        <FormLabel>{label}</FormLabel>
         <Select value={value || ""} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus}>
           {options.enumOptions.map(({ value, label }, index) => (
             <option key={index} value={value}>
@@ -328,6 +323,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
               formData={useRsi().getSpecificField(column.value)}
+              validator={validator}
             >
               <Button type="submit">Add</Button>
             </Form>
