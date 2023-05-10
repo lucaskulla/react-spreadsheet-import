@@ -119,7 +119,8 @@ export const TemplateColumn = <T extends string>({
           // do nothing, key exists.
         }
       }
-      localStorage.setItem("fieldsList", JSON.stringify(useRsi().getFields()))
+      const allFields = useRsi().getFields()
+      localStorage.setItem("fieldsList", JSON.stringify(allFields.toString()))
     }
   }
   const rsiInstance = useRsi()

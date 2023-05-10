@@ -11,7 +11,6 @@ import type { Data } from "../../types"
 import type { themeOverrides } from "../../theme"
 import type { RowsChangeData } from "react-data-grid"
 import Ajv from "ajv"
-import SchemaA from "/Users/lucaskulla/Desktop/Git/react-spreadsheet-import/static/testSchema1.json"
 
 import { DataIsInvalid } from "../../components/Alerts/DataIsInvalidAlert" // Import the DataIsInvalid component
 
@@ -97,19 +96,21 @@ export const ValidationStep = <T extends string>({ initialData }: Props<T>) => {
     let hasInvalidData = false
 
     //Only if schema is used, validation step should be executed
-    if (localStorage.getItem("schema") === "true") {
+    if (localStorage.getItem("schemaUsed") === "true") {
       const ajv = new Ajv()
-      const validate = ajv.compile(SchemaA)
+      const schema = localStorage.getItem("schemaFromAPI")
+      if (schema) {
+        const validate = ajv.compile(JSON.parse(schema))
+        // Validate data against the schema
 
-      // Validate data against the schema
-
-      for (let i = 0; i < all.length; i++) {
-        const validationResult = validate(all[i])
-        if (!validationResult) {
-          hasInvalidData = true
-          console.error("Validation failed", validate.errors)
-        } else {
-          console.log("Validation passed")
+        for (let i = 0; i < all.length; i++) {
+          const validationResult = validate(all[i])
+          if (!validationResult) {
+            hasInvalidData = true
+            console.error("Validation failed", validate.errors)
+          } else {
+            console.log("Validation passed")
+          }
         }
       }
 

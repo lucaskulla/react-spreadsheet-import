@@ -78,6 +78,7 @@ export const Basic = () => {
     localStorage.removeItem("fields")
     localStorage.removeItem("schemaToUse")
     localStorage.removeItem("schemaUsed")
+    localStorage.removeItem("schemaFromAPI")
   }
 
   return (

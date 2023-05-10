@@ -177,10 +177,14 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
         const selectedSchema = localStorage.getItem("schemaToUse")
         if (selectedSchema !== null) {
           const response = await apiClient.get("/schema/" + selectedSchema)
-          const version = selectedSchema.substring(selectedSchema.lastIndexOf(":") + 1) // "0.0.1"
-          setFetchedSchema(response.data[version])
-          setConvertedSchema(schemaToFields(response.data[version]))
-          setIsSchemaFetched(true)
+          if (response.data) {
+            const version = selectedSchema.substring(selectedSchema.lastIndexOf(":") + 1) // "0.0.1"
+            console.log(response.data[version], "response.data[version]")
+            localStorage.setItem("schemaFromAPI", JSON.stringify(response.data[version]))
+            setFetchedSchema(response.data[version])
+            setConvertedSchema(schemaToFields(response.data[version]))
+            setIsSchemaFetched(true)
+          }
         } else {
           console.log("Schema already fetched")
         }
