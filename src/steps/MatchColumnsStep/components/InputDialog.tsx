@@ -1,6 +1,9 @@
 import {
+  Box,
   Button,
+  Checkbox,
   FormControl,
+  FormLabel,
   Heading,
   Input,
   Modal,
@@ -56,7 +59,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
         },
       },
       fieldType: {
-        $ref: "#/definitions/FieldType",
+        enum: ["checkbox", "select", "input"],
       },
       example: {
         type: "string",
@@ -90,79 +93,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
           },
         },
         required: ["rule", "errorMessage"],
-        additionalProperties: false,
-      },
-      FieldType: {
-        type: "object",
-        oneOf: [
-          {
-            properties: {
-              type: {
-                type: "string",
-                enum: ["checkbox"],
-              },
-              booleanMatches: {
-                type: "object",
-                additionalProperties: {
-                  type: "boolean",
-                },
-              },
-            },
-            required: ["type"],
-            additionalProperties: false,
-          },
-          {
-            properties: {
-              type: {
-                type: "string",
-                enum: ["select"],
-              },
-              options: {
-                type: "array",
-                items: {
-                  $ref: "#/definitions/SelectOption",
-                },
-              },
-            },
-            required: ["type", "options"],
-            additionalProperties: false,
-          },
-          {
-            properties: {
-              type: {
-                type: "string",
-                enum: ["addOption"],
-              },
-              value: {
-                type: "string",
-              },
-            },
-            required: ["type", "value"],
-            additionalProperties: false,
-          },
-          {
-            properties: {
-              type: {
-                type: "string",
-                enum: ["input"],
-              },
-            },
-            required: ["type"],
-            additionalProperties: false,
-          },
-        ],
-      },
-      SelectOption: {
-        type: "object",
-        properties: {
-          label: {
-            type: "string",
-          },
-          value: {
-            type: "string",
-          },
-        },
-        required: ["label", "value"],
         additionalProperties: false,
       },
     },
@@ -281,6 +211,98 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
     )
   }
 
+  const ValidationsField = (props) => {
+    const { schema, uiSchema, formData, onChange, onBlur, onFocus } = props
+
+    const [currentValidations, setCurrentValidations] = React.useState(formData || [])
+
+    const updateValidation = (index, updatedValidation) => {
+      const newValidations = currentValidations.slice()
+      newValidations[index] = updatedValidation
+      setCurrentValidations(newValidations)
+      onChange(newValidations)
+    }
+
+    const handleAddValidation = () => {
+      setCurrentValidations([...currentValidations, {}])
+      onChange([...currentValidations, {}])
+    }
+
+    return (
+      <Box>
+        {currentValidations.map((validation, index) => (
+          <ValidationEditor
+            key={index}
+            index={index}
+            validation={validation}
+            onChange={(updatedValidation) => updateValidation(index, updatedValidation)}
+          />
+        ))}
+        <Button onClick={handleAddValidation} mt={2} colorScheme="gray">
+          Add Validation
+        </Button>
+      </Box>
+    )
+  }
+
+  const ValidationEditor = (props) => {
+    const { index, validation, onChange } = props
+    const [currentValidation, setCurrentValidation] = React.useState(validation)
+
+    const handleFieldChange = (field, value) => {
+      setCurrentValidation({ ...currentValidation, [field]: value })
+      onChange({ ...currentValidation, [field]: value })
+    }
+
+    return (
+      <Box borderWidth="1px" borderRadius="lg" p={4} mb={4}>
+        <FormControl>
+          <FormLabel>Rule</FormLabel>
+          <Select value={currentValidation.rule || ""} onChange={(e) => handleFieldChange("rule", e.target.value)}>
+            <option value="">Select a rule</option>
+            <option value="required">Required</option>
+            <option value="unique">Unique</option>
+            <option value="regex">Regex</option>
+          </Select>
+        </FormControl>
+        {currentValidation.rule === "regex" && (
+          <FormControl>
+            <FormLabel>Value</FormLabel>
+            <Input value={currentValidation.value || ""} onChange={(e) => handleFieldChange("value", e.target.value)} />
+          </FormControl>
+        )}
+        {currentValidation.rule === "regex" && (
+          <FormControl>
+            <FormLabel>Flags</FormLabel>
+            <Input value={currentValidation.flags || ""} onChange={(e) => handleFieldChange("flags", e.target.value)} />
+          </FormControl>
+        )}
+        <FormControl>
+          <FormLabel>Error Message</FormLabel>
+          <Input
+            value={currentValidation.errorMessage || ""}
+            onChange={(e) => handleFieldChange("errorMessage", e.target.value)}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Level</FormLabel>
+          <Select value={currentValidation.level || ""} onChange={(e) => handleFieldChange("level", e.target.value)}>
+            <option value="">Select a level</option>
+            <option value="warning">Warning</option>
+            <option value="error">Error</option>
+          </Select>
+        </FormControl>
+        <FormControl display="flex" alignItems="center">
+          <FormLabel mb="0">Allow Empty</FormLabel>
+          <Checkbox
+            isChecked={currentValidation.allowEmpty || false}
+            onChange={(e) => handleFieldChange("allowEmpty", e.target.checked)}
+          />
+        </FormControl>
+      </Box>
+    )
+  }
+
   const uiSchema = {
     "ui:rootFieldId": "label",
     "ui:autofocus": true,
@@ -297,10 +319,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
       "ui:widget": (props) => <AlternateMatchesWidget {...props} />,
     },
     validations: {
-      "ui:widget": "select",
-      "ui:options": {
-        className: "form-control",
-      },
+      "ui:widget": (props) => <ValidationsField {...props} />,
     },
     fieldType: {
       "ui:widget": (props) => <ChakraSelect {...props} />,
@@ -325,7 +344,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
               formData={useRsi().getSpecificField(column.value)}
               validator={validator}
             >
-              <Button type="submit">Add</Button>
+              <Button type="submit">save</Button>
             </Form>
           </ModalBody>
           <ModalFooter>
