@@ -15,7 +15,7 @@ export type RsiProps<T extends string> = {
   //Get field property
   getFields: () => Fields<T>
   //Get specific field property
-  getSpecificField: (f: string) => Field<T>
+  getSpecificField: (f: string) => Field<string>
 
   //In the beginning user has option to choose between using an exisiting schema or creating a new one
   //Set if schema is used
