@@ -21,7 +21,7 @@ import { MatchColumnSelect } from "../../../components/Selects/MatchColumnSelect
 import type { Styles } from "./ColumnGrid"
 import React, { useEffect, useState } from "react"
 import { SubMatchingSelect } from "./SubMatchingSelect"
-import MyModal from "./InputDialog"
+import ModalAddField from "./InputDialog"
 import { EditOrAddIcon } from "./AddEditIcon"
 import type { JSONSchema6 } from "json-schema"
 
@@ -40,24 +40,16 @@ type TemplateColumnProps<T extends string> = {
   convertedSchema: Fields<string>
 }
 
-export const TemplateColumn = <T extends string>({
-  column,
-  onChange,
-  onSubChange,
-  schema,
-  convertedSchema,
-}: TemplateColumnProps<T>) => {
-  const { translations } = useRsi<T>() //removed fields from { fields, translations}
+export const TemplateColumn = <T extends string>({ column, onChange, onSubChange }: TemplateColumnProps<T>) => {
+  const { translations, getFields } = useRsi<T>() //removed fields from { fields, translations}
   const styles = useStyleConfig("MatchColumnsStep") as Styles
   const isIgnored = column.type === ColumnType.ignored
   const isChecked = //LK: wird benötigt um zu ermitteln, ob etwas ausgewählt wurde, um die Checkbox auszufüllen.
     column.type === ColumnType.matched ||
     column.type === ColumnType.matchedCheckbox ||
     column.type === ColumnType.matchedSelectOptions
-  const fields = useRsi<T>().getFields()
+  const fields = getFields()
   const isSelect = "matchedOptions" in column
-  //let selectOptions = fields.map(({ label, key }) => ({ value: key, label })) //beinhaltet alle möglichen Optionien, die man auwählen kann.
-
   const [selectOption, setSelectOption] = useState<any>(fields.map(({ label, key }) => ({ value: key, label })))
 
   const selectValue = selectOption.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
@@ -73,7 +65,6 @@ export const TemplateColumn = <T extends string>({
     validations: [],
   })
 
-  // Add this to the top of your component
   const { setFields } = useRsi()
 
   const handleFormSubmit = (inputValue: Field<string>) => {
@@ -123,12 +114,10 @@ export const TemplateColumn = <T extends string>({
       localStorage.setItem("fieldsList", JSON.stringify(allFields.toString()))
     }
   }
-  const rsiInstance = useRsi()
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
       {(() => addMissingFieldsFromHeader(useRsi().getFields(), setFields))()}
-
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (
@@ -153,15 +142,13 @@ export const TemplateColumn = <T extends string>({
               ></Button>
             </Tooltip>
             <Box>
-              <MyModal
+              <ModalAddField
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSubmit={handleFormSubmit}
                 isChecked={isChecked}
                 column={column}
               />
-              {setFields(savedInput)}
-              {console.log(useRsi().getFields())}
             </Box>
           </Flex>
           {isSelect && (

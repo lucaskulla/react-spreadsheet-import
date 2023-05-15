@@ -73,7 +73,7 @@ export type Columns<T extends string> = Column<T>[]
 export const MatchColumnsStep = <T extends string>({ data, headerValues, onContinue }: MatchColumnsProps<T>) => {
   const toast = useToast()
   const dataExample = data.slice(0, 2)
-  const { autoMapHeaders, autoMapDistance, translations } = useRsi<T>() // LK: Hier war eigentlich noch fields drin
+  const { autoMapHeaders, autoMapDistance, translations, getFields } = useRsi<T>() // LK: Hier war eigentlich noch fields drin
   const [isLoading, setIsLoading] = useState(false)
   const [columns, setColumns] = useState<Columns<T>>(
     // Do not remove spread, it indexes empty array elements, otherwise map() skips over them
@@ -86,7 +86,8 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
   const [convertedSchema, setConvertedSchema] = useState<Field<string>[]>()
   const onChange = useCallback(
     (value: T, columnIndex: number) => {
-      const field = fields.find((field) => field.key === value) as unknown as Field<T>
+      //needs to directly call getFields(). If not adding a new field and directly assigning it will not work.
+      const field = getFields().find((field) => field.key === value) as unknown as Field<T>
       const existingFieldIndex = columns.findIndex((column) => "value" in column && column.value === field.key)
       setColumns(
         columns.map<Column<T>>((column, index) => {
@@ -179,7 +180,6 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
           const response = await apiClient.get("/schema/" + selectedSchema)
           if (response.data) {
             const version = selectedSchema.substring(selectedSchema.lastIndexOf(":") + 1) // "0.0.1"
-            console.log(response.data[version], "response.data[version]")
             localStorage.setItem("schemaFromAPI", JSON.stringify(response.data[version]))
             setFetchedSchema(response.data[version])
             setConvertedSchema(schemaToFields(response.data[version]))
@@ -252,7 +252,7 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
             onSubChange={onSubChange}
             schema={fetchedSchema}
             convertedSchema={convertedSchema}
-          /> //field={field} hinzugefügen
+          />
         )}
       />
     </>

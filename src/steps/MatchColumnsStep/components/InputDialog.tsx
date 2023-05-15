@@ -33,7 +33,8 @@ interface ModalProps {
   column: Column<string>
 }
 
-const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
+const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
+  const { getSpecificField, setFields } = useRsi()
   const schemaField: RJSFSchema = {
     type: "object",
     properties: {
@@ -102,6 +103,8 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
     if (formData["fieldType"]) {
       formData["fieldType"] = { type: formData["fieldType"] }
     }
+
+    setFields(formData)
     onSubmit(formData)
     onClose()
   }
@@ -122,7 +125,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
   }
 
   const ChakraTextarea = (props) => {
-    const { propertyName, onChange, onBlur, onFocus, value } = props
+    const { onChange, onBlur, onFocus, value } = props
     return (
       <>
         <Textarea value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
@@ -344,7 +347,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
               schema={schemaField}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
-              formData={useRsi().getSpecificField(column.value)}
+              formData={getSpecificField(column.value)}
               validator={validator}
             >
               <Button type="submit">save</Button>
@@ -359,4 +362,4 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
   )
 }
 
-export default MyModal
+export default ModalAddField
