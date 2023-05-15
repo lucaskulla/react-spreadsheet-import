@@ -98,6 +98,10 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
     },
   }
   const handleSubmit = ({ formData }: { formData: FormData }) => {
+    //This if is need because officially FieldType is an array, however, in the schema above it is just an enum, because it is easier to display. Here is the array created
+    if (formData["fieldType"]) {
+      formData["fieldType"] = { type: formData["fieldType"] }
+    }
     onSubmit(formData)
     onClose()
   }
@@ -109,7 +113,7 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
   ) as typeof themeOverrides["components"]["MatchColumnsStep"]["baseStyle"]
 
   const ChakraInput = (props) => {
-    const { propertyName, onChange, onBlur, onFocus, value } = props
+    const { propertyName, onChange, onBlur, onFocus, value = "" } = props
     return (
       <>
         <Input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
@@ -185,7 +189,6 @@ const MyModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, c
 
   const ChakraSelect = (props) => {
     const { id, label, options, value, onChange, onBlur, onFocus } = props
-
     const handleChange = (event) => {
       onChange(event.target.value)
     }

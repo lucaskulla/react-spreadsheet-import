@@ -1,7 +1,7 @@
 import { ReactSpreadsheetImport } from "../ReactSpreadsheetImport"
-import { Box, Button, Code, Link, useDisclosure } from "@chakra-ui/react"
+import { Box, Button, Code, Link, useDisclosure, useToast } from "@chakra-ui/react"
 import { mockRsiValues } from "./mockRsiValues"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import type { Data } from "../types"
 import { saveAs } from "file-saver"
 import fieldsToJsonSchema from "../utils/fieldsToSchema"
@@ -27,6 +27,7 @@ const options: Option[] = [
 export const Basic = () => {
   const [data, setData] = useState<any>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const toast = useToast()
 
   const [isChecked, setIsChecked] = useState(false)
   const [selectedOption, setSelectedOption] = useState("")
@@ -62,14 +63,34 @@ export const Basic = () => {
     }
   }
 
-  function handleDownloadNewSchema(): void {
+  const errorToast = useCallback(
+    (description: string) => {
+      toast({
+        status: "error",
+        variant: "left-accent",
+        position: "bottom-left",
+        title: "Upload failed",
+        description: description,
+        isClosable: true,
+      })
+    },
+    [toast],
+  )
+
+  function uploadNewSchemaToAPI(): void {
     const fields = localStorage.getItem("fieldsList")
     const schemaUsedStorage = localStorage.getItem("schemaUsed")
     const schemaUsed: boolean = schemaUsedStorage ? schemaUsedStorage === "true" : false
     if (fields) {
       const conversion = fieldsToJsonSchema(JSON.parse(fields), schemaUsed)
       console.log(JSON.stringify(conversion, null, 2), "conversion")
-      apiClient.post("/schema", conversion).then((r) => console.log(r))
+      apiClient
+        .post("/schema", conversion)
+        .then((r) => console.log("r"))
+        .catch((e) => {
+          const errorMessage = e.message || "An unexpected error occurred"
+          errorToast(errorMessage)
+        })
     }
   }
 
@@ -141,7 +162,7 @@ export const Basic = () => {
               Download Invalid Data
             </Button>
             <Button
-              onClick={() => handleDownloadNewSchema()}
+              onClick={() => uploadNewSchemaToAPI()}
               bg="blue.500"
               color="black"
               p="8px"

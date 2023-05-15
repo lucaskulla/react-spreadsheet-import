@@ -74,7 +74,7 @@ export const TemplateColumn = <T extends string>({
   })
 
   // Add this to the top of your component
-  const [fieldsAdded, setFieldsAdded] = useState(false)
+  const { setFields } = useRsi()
 
   const handleFormSubmit = (inputValue: Field<string>) => {
     setSavedInput(inputValue)
@@ -127,7 +127,7 @@ export const TemplateColumn = <T extends string>({
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
-      {(() => addMissingFieldsFromHeader(useRsi().getFields(), useRsi().setFields))()}
+      {(() => addMissingFieldsFromHeader(useRsi().getFields(), setFields))()}
 
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
@@ -160,7 +160,8 @@ export const TemplateColumn = <T extends string>({
                 isChecked={isChecked}
                 column={column}
               />
-              {useRsi().setFields(savedInput)}
+              {setFields(savedInput)}
+              {console.log(useRsi().getFields())}
             </Box>
           </Flex>
           {isSelect && (

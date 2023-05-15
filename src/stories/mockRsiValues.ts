@@ -17,7 +17,7 @@ export const mockRsiValues = mockComponentBehaviourForTypes({
         //Field does not exist yet -> new entry
         fields = fields.concat(field)
       } else {
-        console.log("field already exists")
+        console.log("field already exists", field.key)
         //Field already exists -> update entry
         fields[index] = field
       }
