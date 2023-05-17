@@ -1,7 +1,7 @@
 import { ReactSpreadsheetImport } from "../ReactSpreadsheetImport"
 import { Box, Button, Code, Link, useDisclosure, useToast } from "@chakra-ui/react"
 import { mockRsiValues } from "./mockRsiValues"
-import { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import type { Data } from "../types"
 import { saveAs } from "file-saver"
 import apiClient from "../api/apiClient"
@@ -22,7 +22,6 @@ const options: Option[] = [
   { label: "Option 2", value: "option2" },
   { label: "Option 3", value: "option3" },
 ]
-
 // Output: { label: 'The person\'s first name.', key: 'firstName', fieldType: { type: 'input' }, validations: [ { rule: 'required', errorMessage: 'This field is required.' } ] }
 
 export const Basic = () => {
@@ -33,7 +32,10 @@ export const Basic = () => {
   const [isChecked, setIsChecked] = useState(false)
   const [selectedOption, setSelectedOption] = useState("")
   const [showPreview, setShowPreview] = useState(false)
-  const [previewSchema, setPreviewSchema] = useState<JSONSchema6>({})
+  const [previewSchema, setPreviewSchema] = useState<JSONSchema6>()
+  const [isOpenCodeEditor, setIsOpenCodeEditor] = useState(false)
+  const [language, setLanguage] = useState("javascript")
+  const [code, setCode] = useState("")
 
   function handleCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
     setIsChecked(event.target.checked)
@@ -100,7 +102,18 @@ export const Basic = () => {
     }
   }
 
+  useEffect(() => {
+    const fields = localStorage.getItem("fieldsList")
+    const schemaUsedStorage = localStorage.getItem("schemaUsed")
+    const schemaUsed: boolean = schemaUsedStorage ? schemaUsedStorage === "true" : false
+    if (fields) {
+      const conversion = fieldsToJsonSchema(JSON.parse(fields), schemaUsed)
+      setPreviewSchema(conversion)
+    }
+  }, [])
+
   function uploadNewSchemaToAPI(): void {
+    //ToDo daten aus useEffekt nehmen bzw. aus previewSchema
     const fields = localStorage.getItem("fieldsList")
     const schemaUsedStorage = localStorage.getItem("schemaUsed")
     const schemaUsed: boolean = schemaUsedStorage ? schemaUsedStorage === "true" : false
@@ -124,6 +137,23 @@ export const Basic = () => {
     localStorage.removeItem("schemaToUse")
     localStorage.removeItem("schemaUsed")
     localStorage.removeItem("schemaFromAPI")
+  }
+
+  const options = [
+    { label: "Python", value: "python" },
+    { label: "JavaScript", value: "javascript" },
+    { label: "Java", value: "java" },
+    { label: "XSLT", value: "xml" },
+  ]
+
+  const handleSend = async () => {
+    try {
+      //await axios.post("/code", { code });
+      alert("Code sent successfully")
+    } catch (error) {
+      alert("Failed to send code")
+      console.error(error)
+    }
   }
 
   return (
@@ -197,22 +227,6 @@ export const Basic = () => {
             >
               {showPreview ? "Hide Schema Preview" : "Show Schema Preview"}
             </Button>
-            {showPreview && previewSchema && (
-              <Box pt={32} display="flex" gap="8px" flexDirection="column">
-                <b>Preview Schema:</b>
-                <Code
-                  display="flex"
-                  alignItems="center"
-                  borderRadius="16px"
-                  fontSize="12px"
-                  background="#4A5568"
-                  color="white"
-                  p={32}
-                >
-                  <pre>{JSON.stringify(previewSchema, undefined, 4)}</pre>
-                </Code>
-              </Box>
-            )}
             <Button
               onClick={uploadDataToAPI}
               bg="blue.500"
@@ -241,6 +255,22 @@ export const Basic = () => {
         </Box>
       )}
       <ReactSpreadsheetImport {...mockRsiValues} isOpen={isOpen} onClose={onClose} onSubmit={setData} />
+      {showPreview && previewSchema && (
+        <Box pt={64} display="flex" gap="8px" flexDirection="column">
+          <b>Schema:</b>
+          <Code
+            display="flex"
+            alignItems="center"
+            borderRadius="16px"
+            fontSize="12px"
+            background="#4A5568"
+            color="white"
+            p={32}
+          >
+            <pre>{JSON.stringify(previewSchema, undefined, 4)}</pre>{" "}
+          </Code>
+        </Box>
+      )}
       {data && (
         <Box pt={64} display="flex" gap="8px" flexDirection="column">
           <b>Returned data:</b>

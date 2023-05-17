@@ -100,21 +100,31 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
       } else {
         const key = fields.find((f) => f.key === header)
         if (key === undefined) {
+          const alterMatches = []
+
           const headerWithoutUnderscore = header.replace(/_/g, " ")
           const headerInLowerCase = headerWithoutUnderscore.toLowerCase()
           const headerInUpperCase = headerInLowerCase.charAt(0).toUpperCase() + headerInLowerCase.slice(1)
           const headerInUpperCaseWithRest = headerInUpperCase + headerInLowerCase.slice(1)
           const headerInUpperCaseWithRestAndSpaces = headerInUpperCaseWithRest.replace(/ /g, "")
 
+          alterMatches.push(headerWithoutUnderscore)
+
+          if (alterMatches.some((item) => item === headerInLowerCase)) {
+            alterMatches.push(headerInLowerCase)
+          }
+          if (alterMatches.some((item) => item === headerInUpperCase)) {
+            alterMatches.push(headerInUpperCase)
+          }
+          if (alterMatches.some((item) => item === headerInUpperCaseWithRest)) {
+            alterMatches.push(headerInUpperCaseWithRest)
+          }
+          if (alterMatches.some((item) => item === headerInUpperCaseWithRestAndSpaces)) {
+            alterMatches.push(headerInUpperCaseWithRestAndSpaces)
+          }
+
           const fieldToAdd: Field<string> = {
-            alternateMatches: [
-              header,
-              headerWithoutUnderscore,
-              headerInLowerCase,
-              headerInUpperCase,
-              headerInUpperCaseWithRest,
-              headerInUpperCaseWithRestAndSpaces,
-            ],
+            alternateMatches: alterMatches,
             description: "This field element is automatically generated",
             example: "",
             fieldType: {
