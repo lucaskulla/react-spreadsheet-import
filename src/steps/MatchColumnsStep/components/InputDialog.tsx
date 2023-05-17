@@ -24,6 +24,7 @@ import { useRsi } from "../../../hooks/useRsi"
 import ReactSelect from "react-select"
 import validator from "@rjsf/validator-ajv8"
 import type { RJSFSchema } from "@rjsf/utils"
+import type { Field } from "../../../types"
 
 //TODO Ende Validierung
 //TODO Post der Daten ggf. 5 Seite erstellen
@@ -31,13 +32,25 @@ import type { RJSFSchema } from "@rjsf/utils"
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (formData: FormData) => void
+  onSubmit: (formData: Field<string>) => void
   isChecked: boolean
   column: Column<string>
 }
 
+interface ValidationEditorProps {
+  index: null
+}
+
+interface ValidationEditorProps {
+  index: null
+}
+
+interface ValidationEditorProps {
+  index: React.Key | null | undefined
+}
+
 const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
-  const { getSpecificField, setFields } = useRsi()
+  const { getSpecificField, addField } = useRsi()
 
   const [createNewField, setCreateNewField] = React.useState(false)
 
@@ -104,14 +117,21 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
       },
     },
   }
-  const handleSubmit = ({ formData }: { formData: FormData }) => {
+
+  interface MyFormData extends FormData {
+    fieldType?: { type: string } | string
+  }
+
+  const handleSubmit = ({ formData }: { formData: MyFormData }) => {
     //This if is need because officially FieldType is an array, however, in the schema above it is just an enum, because it is easier to display. Here is the array created
-    if (formData["fieldType"]) {
-      formData["fieldType"] = { type: formData["fieldType"] }
+    if (typeof formData.fieldType === "string") {
+      formData.fieldType = { type: formData.fieldType }
     }
-    setFields(formData)
+
+    const f = formData as unknown as Field<string>
+    addField(f)
     setCreateNewField(false)
-    onSubmit(formData)
+    onSubmit(f)
     onClose()
   }
   const [scrollBehavior, setScrollBehavior] = React.useState("inside")
@@ -133,8 +153,8 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
   }, [isOpen])
 
   //Key is a special case. If the key already exists, the field is disabled
-  const ChakraInputKey = (props) => {
-    const { propertyName, onChange, onBlur, onFocus, value = "" } = props
+  const ChakraInputKey = (props: { onChange: any; onBlur: any; onFocus: any; value?: "" | undefined }) => {
+    const { onChange, onBlur, onFocus, value = "" } = props
 
     // Get specific field data based on the current key
     const currentField = getSpecificField(value)
@@ -153,8 +173,8 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ChakraInput = (props) => {
-    const { propertyName, onChange, onBlur, onFocus, value = "" } = props
+  const ChakraInput = (props: { onChange: any; onBlur: any; onFocus: any; value?: "" | undefined }) => {
+    const { onChange, onBlur, onFocus, value = "" } = props
     return (
       <>
         <Input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} onFocus={onFocus} />
@@ -162,7 +182,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ChakraTextarea = (props) => {
+  const ChakraTextarea = (props: { onChange: any; onBlur: any; onFocus: any; value: any }) => {
     const { onChange, onBlur, onFocus, value } = props
     return (
       <>
@@ -171,21 +191,23 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const AlternateMatchesWidget = (props) => {
-    const { id, label, value, onChange, onBlur, onFocus } = props
+  const AlternateMatchesWidget = (props: { id: any; value: any; onChange: any; onBlur: any; onFocus: any }) => {
+    const { id, value, onChange, onBlur, onFocus } = props
 
     const [inputValue, setInputValue] = React.useState("")
-    const [options, setOptions] = React.useState(value.map((val) => ({ value: val, label: val })))
+    const [options, setOptions] = React.useState(
+      value.map((val: { label: any; value: any }) => ({ value: val, label: val })),
+    )
 
-    const handleTagsChange = (selectedOptions) => {
-      onChange(selectedOptions.map((option) => option.value))
+    const handleTagsChange = (selectedOptions: { value: any }[]) => {
+      onChange(selectedOptions.map((option: { value: any }) => option.value))
     }
 
-    const handleInputChange = (inputValue) => {
+    const handleInputChange = (inputValue: React.SetStateAction<string>) => {
       setInputValue(inputValue)
     }
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: { key: any; preventDefault: () => void }) => {
       if (!inputValue) return
       switch (event.key) {
         case "Enter":
@@ -208,7 +230,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
       onFocus(id, value)
     }
 
-    const selectedOptions = (value || []).map((val) => ({ value: val, label: val }))
+    const selectedOptions = (value || []).map((val: { label: any; value: any }) => ({ value: val, label: val }))
 
     return (
       <FormControl id={id}>
@@ -228,9 +250,9 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ChakraSelect = (props) => {
-    const { id, label, options, value, onChange, onBlur, onFocus } = props
-    const handleChange = (event) => {
+  const ChakraSelect = (props: { id: any; options: any; value: any; onChange: any; onBlur: any; onFocus: any }) => {
+    const { id, options, value, onChange, onBlur, onFocus } = props
+    const handleChange = (event: { target: { value: any } }) => {
       onChange(event.target.value)
     }
 
@@ -255,13 +277,14 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ValidationsField = (props) => {
-    const { schema, uiSchema, formData, onChange, onBlur, onFocus } = props
+  const ValidationsField = (props: { formData: any; onChange: any }) => {
+    const { formData, onChange } = props
 
     const [currentValidations, setCurrentValidations] = React.useState(formData || [])
 
-    const updateValidation = (index, updatedValidation) => {
+    const updateValidation = (index: React.Key | null | undefined, updatedValidation: any) => {
       const newValidations = currentValidations.slice()
+      if (index === null || index === undefined) return
       newValidations[index] = updatedValidation
       setCurrentValidations(newValidations)
       onChange(newValidations)
@@ -274,12 +297,12 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
 
     return (
       <Box>
-        {currentValidations.map((validation, index) => (
+        {currentValidations.map((validation: any, index: React.Key | null | undefined) => (
           <ValidationEditor
             key={index}
             index={index}
             validation={validation}
-            onChange={(updatedValidation) => updateValidation(index, updatedValidation)}
+            onChange={(updatedValidation: any) => updateValidation(index, updatedValidation)}
           />
         ))}
         <Button onClick={handleAddValidation} mt={2} colorScheme="gray">
@@ -289,11 +312,11 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ValidationEditor = (props) => {
-    const { index, validation, onChange } = props
+  const ValidationEditor = (props: { validation: any; onChange: any }) => {
+    const { validation, onChange } = props
     const [currentValidation, setCurrentValidation] = React.useState(validation)
 
-    const handleFieldChange = (field, value) => {
+    const handleFieldChange = (field: string, value: string | boolean) => {
       setCurrentValidation({ ...currentValidation, [field]: value })
       onChange({ ...currentValidation, [field]: value })
     }
@@ -351,25 +374,46 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     "ui:rootFieldId": "label",
     "ui:autofocus": true,
     label: {
-      "ui:widget": (props) => <ChakraInput {...props} />,
+      "ui:widget": (
+        props: JSX.IntrinsicAttributes & { onChange: any; onBlur: any; onFocus: any; value?: "" | undefined },
+      ) => <ChakraInput {...props} />,
     },
     key: {
-      "ui:widget": (props) => <ChakraInput {...props} />,
+      "ui:widget": (
+        props: JSX.IntrinsicAttributes & { onChange: any; onBlur: any; onFocus: any; value?: "" | undefined },
+      ) => <ChakraInput {...props} />,
     },
     description: {
-      "ui:widget": (props) => <ChakraTextarea {...props} />,
+      "ui:widget": (props: JSX.IntrinsicAttributes & { onChange: any; onBlur: any; onFocus: any; value: any }) => (
+        <ChakraTextarea {...props} />
+      ),
     },
     alternateMatchesArray: {
-      "ui:widget": (props) => <AlternateMatchesWidget {...props} />,
+      "ui:widget": (
+        props: JSX.IntrinsicAttributes & { id: any; value: any; onChange: any; onBlur: any; onFocus: any },
+      ) => <AlternateMatchesWidget {...props} />,
     },
     validations: {
-      "ui:widget": (props) => <ValidationsField {...props} />,
+      "ui:widget": (props: JSX.IntrinsicAttributes & { formData: any; onChange: any }) => (
+        <ValidationsField {...props} />
+      ),
     },
     fieldType: {
-      "ui:widget": (props) => <ChakraSelect {...props} />,
+      "ui:widget": (
+        props: JSX.IntrinsicAttributes & {
+          id: any
+          options: any
+          value: any
+          onChange: any
+          onBlur: any
+          onFocus: any
+        },
+      ) => <ChakraSelect {...props} />,
     },
     example: {
-      "ui:widget": (props) => <ChakraTextarea {...props} />,
+      "ui:widget": (props: JSX.IntrinsicAttributes & { onChange: any; onBlur: any; onFocus: any; value: any }) => (
+        <ChakraTextarea {...props} />
+      ),
     },
   }
 
@@ -385,7 +429,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
               schema={schemaField}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
-              formData={createNewField ? "" : getSpecificField(column.value)}
+              formData={createNewField ? "" : getSpecificField(column?.value)}
               validator={validator}
             >
               <Button type="submit">save</Button>

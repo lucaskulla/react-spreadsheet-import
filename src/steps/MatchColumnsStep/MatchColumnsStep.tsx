@@ -221,7 +221,7 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
   const [fieldsAdded, setFieldsAdded] = useState(false)
   useEffect(() => {
     if (!fieldsAdded && isSchemaFetched) {
-      addMissingFieldsFromHeader(rsiInstance.getFields(), rsiInstance.setFields)
+      addMissingFieldsFromHeader(rsiInstance.getFields(), rsiInstance.addField)
         .then(() => setFieldsAdded(true))
         .catch((error) => console.error("Error adding missing fields:", error))
     }
@@ -253,7 +253,7 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
             onChange={onChange}
             onSubChange={onSubChange}
             schema={fetchedSchema}
-            convertedSchema={convertedSchema}
+            convertedSchema={convertedSchema || []}
           />
         )}
       />

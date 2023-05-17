@@ -7,7 +7,7 @@ let schemaUsed = false
 const mockComponentBehaviourForTypes = <T extends string>(props: RsiProps<T>) => props
 
 export const mockRsiValues = mockComponentBehaviourForTypes({
-  setFields: (field: Field<string>) => {
+  addField: (field: Field<string>) => {
     if (field.key === undefined || field.key === "") {
       console.log("field is empty")
       return null

@@ -11,11 +11,11 @@ export type RsiProps<T extends string> = {
   // Field description for requested data
   fields?: Fields<T> //ist jetzt optional, mal schauen, ob das klappt!
   //Set field property -> ACHTUNG: Man darf nicht den KEY ändern. Das führt zu Problemen!
-  setFields: (fields: Field<string>) => void
+  addField: (fields: Field<string>) => void
   //Get field property
   getFields: () => Fields<T>
   //Get specific field property
-  getSpecificField: (f: string) => Field<string>
+  getSpecificField: (f: string) => Field<string> | null | undefined
 
   //In the beginning user has option to choose between using an exisiting schema or creating a new one
   //Set if schema is used

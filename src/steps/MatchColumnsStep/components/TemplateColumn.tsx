@@ -44,7 +44,7 @@ type TemplateColumnProps<T extends string> = {
 }
 
 export const TemplateColumn = <T extends string>({ column, onChange, onSubChange }: TemplateColumnProps<T>) => {
-  const { translations, getFields } = useRsi<T>() //removed fields from { fields, translations}
+  const { translations, getFields, addField } = useRsi<T>() //removed fields from { fields, translations}
   const styles = useStyleConfig("MatchColumnsStep") as Styles
   const isIgnored = column.type === ColumnType.ignored
   const isChecked = //LK: wird benötigt um zu ermitteln, ob etwas ausgewählt wurde, um die Checkbox auszufüllen.
@@ -55,7 +55,7 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
   const isSelect = "matchedOptions" in column
   const [selectOption, setSelectOption] = useState<any>(fields.map(({ label, key }) => ({ value: key, label })))
 
-  const selectValue = selectOption.find(({ value }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
+  const selectValue = selectOption.find(({ value }: { value: string }) => "value" in column && column.value === value) //LK: gibt alle selektierten Values zurück
   const [savedInput, setSavedInput] = useState<Field<string>>({
     alternateMatches: [],
     description: "",
@@ -67,8 +67,6 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
     label: "",
     validations: [],
   })
-
-  const { setFields } = useRsi()
 
   const handleFormSubmit = (inputValue: Field<string>) => {
     setSavedInput(inputValue)
@@ -165,7 +163,7 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
 
   return (
     <Flex minH={10} w="100%" flexDir="column" justifyContent="center">
-      {(() => addMissingFieldsFromHeader(useRsi().getFields(), setFields))()}
+      {(() => addMissingFieldsFromHeader(getFields(), addField))()}
       {isIgnored ? (
         <Text sx={styles.selectColumn.text}>{translations.matchColumnsStep.ignoredColumnText}</Text>
       ) : (
