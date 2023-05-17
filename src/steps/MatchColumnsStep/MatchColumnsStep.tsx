@@ -14,6 +14,9 @@ import { UnmatchedFieldsAlert } from "../../components/Alerts/UnmatchedFieldsAle
 import { findUnmatchedRequiredFields } from "./utils/findUnmatchedRequiredFields"
 import apiClient from "../../api/apiClient"
 import schemaToFields from "../../utils/schemaToFields"
+import type { RJSFSchema } from "@rjsf/utils"
+import type { AxiosResponse } from "axios"
+import type { JSONSchema6 } from "json-schema"
 
 export type MatchColumnsProps<T extends string> = {
   data: RawData[]
@@ -82,8 +85,8 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
   const fields = useRsi<T>().getFields() //LK: Die Daten kommen an!!!
   const [showUnmatchedFieldsAlert, setShowUnmatchedFieldsAlert] = useState(false)
 
-  const [fetchedSchema, setFetchedSchema] = useState<string>()
-  const [convertedSchema, setConvertedSchema] = useState<Field<string>[]>()
+  const [fetchedSchema, setFetchedSchema] = useState<JSONSchema6>({})
+  const [convertedSchema, setConvertedSchema] = useState<Fields<string>>()
   const onChange = useCallback(
     (value: T, columnIndex: number) => {
       //needs to directly call getFields(). If not adding a new field and directly assigning it will not work.
@@ -177,7 +180,7 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
       try {
         const selectedSchema = localStorage.getItem("schemaToUse")
         if (selectedSchema !== null) {
-          const response = await apiClient.get("/schema/" + selectedSchema)
+          const response = (await apiClient.get("/schema/" + selectedSchema)) as AxiosResponse<RJSFSchema>
           if (response.data) {
             const version = selectedSchema.substring(selectedSchema.lastIndexOf(":") + 1) // "0.0.1"
             localStorage.setItem("schemaFromAPI", JSON.stringify(response.data[version]))
@@ -206,7 +209,6 @@ export const MatchColumnsStep = <T extends string>({ data, headerValues, onConti
           console.log(i)
           if (convertedSchema) {
             setFieldsFn(convertedSchema[i])
-            console.log(i)
           } else {
             console.log("No schema available - ATTENTION!")
           }

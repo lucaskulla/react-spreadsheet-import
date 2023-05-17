@@ -60,13 +60,17 @@ function fieldsToJsonSchema(fields: Field<string>[], schemaUsed: boolean): JSONS
         }
 
         // Add validations
-        field.validations.forEach((validation) => {
-          if (validation.rule === "required") {
-            schema.required.push(propertyName)
-          } else if (validation.rule === "regex") {
-            currentObject.properties[propertyName].pattern = validation.value
+        if (field.validations) {
+          console.log(field.validations, "field.validations")
+          for (let i = 0; i < field.validations.length; i++) {
+            const validation = field.validations[i]
+            if (validation.rule === "required") {
+              schema.required.push(propertyName)
+            } else if (validation.rule === "regex") {
+              currentObject.properties[propertyName].pattern = validation.value
+            }
           }
-        })
+        }
 
         // Add alternateMatches
         if (field.alternateMatches) {
@@ -92,11 +96,10 @@ function fieldsToJsonSchema(fields: Field<string>[], schemaUsed: boolean): JSONS
       }
     }
   }
-
-  fields.forEach((field) => {
-    const propertyPath = field.label.split(".")
-    addPropertyToSchema(schema, propertyPath, field)
-  })
+  for (let i = 0; i < fields.length; i++) {
+    const propertyPath = fields[i].label.split(".")
+    addPropertyToSchema(schema, propertyPath, fields[i])
+  }
 
   return schema
 }

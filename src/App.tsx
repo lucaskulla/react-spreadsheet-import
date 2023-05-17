@@ -1,16 +1,11 @@
-import { ReactSpreadsheetImport } from "../ReactSpreadsheetImport"
+import { ReactSpreadsheetImport } from "./ReactSpreadsheetImport"
 import { Box, Button, Code, Link, useDisclosure, useToast } from "@chakra-ui/react"
-import { mockRsiValues } from "./mockRsiValues"
+import { mockRsiValues } from "./stories/mockRsiValues"
 import { useCallback, useState } from "react"
-import type { Data } from "../types"
+import type { Data } from "./types"
 import { saveAs } from "file-saver"
-import apiClient from "../api/apiClient"
-import fieldsToJsonSchema from "../utils/fieldsToSchema"
-import type { JSONSchema6 } from "json-schema"
-
-export default {
-  title: "React spreadsheet import",
-}
+import fieldsToJsonSchema from "./utils/fieldsToSchema"
+import apiClient from "./api/apiClient"
 
 interface Option {
   label: string
@@ -32,8 +27,6 @@ export const Basic = () => {
 
   const [isChecked, setIsChecked] = useState(false)
   const [selectedOption, setSelectedOption] = useState("")
-  const [showPreview, setShowPreview] = useState(false)
-  const [previewSchema, setPreviewSchema] = useState<JSONSchema6>({})
 
   function handleCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
     setIsChecked(event.target.checked)
@@ -80,26 +73,6 @@ export const Basic = () => {
     [toast],
   )
 
-  function uploadDataToAPI(): void {
-    const urn = localStorage.getItem("schemaToUse")
-
-    if (data && data["validData"]) {
-      data["validData"].forEach((item: any) => {
-        // Send a POST request for each item
-        apiClient
-          .post("/object/" + urn, item, { params: { skip_validation: false } })
-          .then((response) => {
-            console.log(`Data uploaded successfully for item: ${JSON.stringify(item)}`)
-            console.log(response)
-          })
-          .catch((error) => {
-            console.error(`Error occurred while uploading data for item: ${JSON.stringify(item)}`)
-            console.error(error)
-          })
-      })
-    }
-  }
-
   function uploadNewSchemaToAPI(): void {
     const fields = localStorage.getItem("fieldsList")
     const schemaUsedStorage = localStorage.getItem("schemaUsed")
@@ -107,7 +80,6 @@ export const Basic = () => {
     if (fields) {
       const conversion = fieldsToJsonSchema(JSON.parse(fields), schemaUsed)
       console.log(JSON.stringify(conversion, null, 2), "conversion")
-      //setPreviewSchema(conversion)
       apiClient
         .post("/schema", conversion)
         .then((r) => console.log("r"))
@@ -138,7 +110,7 @@ export const Basic = () => {
           p="8px"
           borderRadius="8px"
         >
-          Start harmonizing your data
+          Open Flow
         </Button>
         (make sure you have a file to upload)
       </Box>
@@ -186,47 +158,7 @@ export const Basic = () => {
               Download Invalid Data
             </Button>
             <Button
-              onClick={() => setShowPreview(!showPreview)}
-              bg="blue.500"
-              color="black"
-              p="8px"
-              border="2px solid #718096"
-              borderRadius="8px"
-              _hover={{ bg: "blue.600" }}
-              _active={{ bg: "blue.700" }}
-            >
-              {showPreview ? "Hide Schema Preview" : "Show Schema Preview"}
-            </Button>
-            {showPreview && previewSchema && (
-              <Box pt={32} display="flex" gap="8px" flexDirection="column">
-                <b>Preview Schema:</b>
-                <Code
-                  display="flex"
-                  alignItems="center"
-                  borderRadius="16px"
-                  fontSize="12px"
-                  background="#4A5568"
-                  color="white"
-                  p={32}
-                >
-                  <pre>{JSON.stringify(previewSchema, undefined, 4)}</pre>
-                </Code>
-              </Box>
-            )}
-            <Button
-              onClick={uploadDataToAPI}
-              bg="blue.500"
-              color="black"
-              p="8px"
-              border="2px solid #718096"
-              borderRadius="8px"
-              _hover={{ bg: "blue.600" }}
-              _active={{ bg: "blue.700" }}
-            >
-              Upload Data to API
-            </Button>
-            <Button
-              onClick={uploadNewSchemaToAPI}
+              onClick={() => uploadNewSchemaToAPI()}
               bg="blue.500"
               color="black"
               p="8px"
@@ -240,6 +172,7 @@ export const Basic = () => {
           </Box>
         </Box>
       )}
+
       <ReactSpreadsheetImport {...mockRsiValues} isOpen={isOpen} onClose={onClose} onSubmit={setData} />
       {data && (
         <Box pt={64} display="flex" gap="8px" flexDirection="column">
@@ -260,3 +193,5 @@ export const Basic = () => {
     </>
   )
 }
+
+export default Basic

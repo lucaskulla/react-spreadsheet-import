@@ -1,10 +1,10 @@
-import type { Field, RegexValidation, RequiredValidation, Validation } from "../types"
+import type { Field, Fields, RegexValidation, RequiredValidation, Validation } from "../types"
 
 type JSONSchema = {
   [key: string]: any
 }
 
-let fieldsList: Field<string>[] = []
+let fieldsList: Fields<string> = []
 
 function createValidations(property: JSONSchema): Validation[] {
   const validations: Validation[] = []
@@ -145,7 +145,7 @@ function processProperty(key: string, property: JSONSchema, defs: JSONSchema, pr
   fieldsList.push(field)
 }
 
-function jsonSchemaToFields(schema: JSONSchema): Field<string>[] {
+function jsonSchemaToFields(schema: JSONSchema): Fields<string> {
   fieldsList = []
   const defs = schema.$defs || {}
 

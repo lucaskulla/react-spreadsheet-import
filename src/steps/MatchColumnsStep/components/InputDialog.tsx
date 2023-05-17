@@ -25,6 +25,9 @@ import ReactSelect from "react-select"
 import validator from "@rjsf/validator-ajv8"
 import type { RJSFSchema } from "@rjsf/utils"
 
+//TODO Ende Validierung
+//TODO Post der Daten ggf. 5 Seite erstellen
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -35,6 +38,9 @@ interface ModalProps {
 
 const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
   const { getSpecificField, setFields } = useRsi()
+
+  const [createNewField, setCreateNewField] = React.useState(false)
+
   const schemaField: RJSFSchema = {
     type: "object",
     properties: {
@@ -103,8 +109,8 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     if (formData["fieldType"]) {
       formData["fieldType"] = { type: formData["fieldType"] }
     }
-
     setFields(formData)
+    setCreateNewField(false)
     onSubmit(formData)
     onClose()
   }
@@ -114,6 +120,38 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
   const styles = useStyleConfig(
     "MatchColumnsStep",
   ) as typeof themeOverrides["components"]["MatchColumnsStep"]["baseStyle"]
+
+  const handleToggleCreateNewField = () => {
+    setCreateNewField((prevValue) => !prevValue)
+  }
+
+  // Reset createNewField whenever the modal closes
+  React.useEffect(() => {
+    if (!isOpen) {
+      setCreateNewField(false)
+    }
+  }, [isOpen])
+
+  //Key is a special case. If the key already exists, the field is disabled
+  const ChakraInputKey = (props) => {
+    const { propertyName, onChange, onBlur, onFocus, value = "" } = props
+
+    // Get specific field data based on the current key
+    const currentField = getSpecificField(value)
+
+    return (
+      <>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          // Disable the field if the key already exists
+          isDisabled={currentField !== undefined}
+        />
+      </>
+    )
+  }
 
   const ChakraInput = (props) => {
     const { propertyName, onChange, onBlur, onFocus, value = "" } = props
@@ -347,13 +385,16 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
               schema={schemaField}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
-              formData={getSpecificField(column.value)}
+              formData={createNewField ? "" : getSpecificField(column.value)}
               validator={validator}
             >
               <Button type="submit">save</Button>
             </Form>
           </ModalBody>
           <ModalFooter>
+            <Button mr={3} onClick={handleToggleCreateNewField}>
+              {createNewField ? "Modify Existing Field" : "Create New Field"}
+            </Button>
             <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>

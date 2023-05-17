@@ -24,7 +24,10 @@ import { SubMatchingSelect } from "./SubMatchingSelect"
 import ModalAddField from "./InputDialog"
 import { EditOrAddIcon } from "./AddEditIcon"
 import type { JSONSchema6 } from "json-schema"
-
+//TODO welche Schema migrieren und auch anschauen
+//TODO X Daten abfragen nebeneinader anzeigen -> eindruck bekommen, wie unterschiedlich die Daten sind ggf. Diff Tool anschuane
+//TODO Textbox xslt, java script (ggf. preview) (React comopents)
+//TODO M Ende Validierung, ob Daten noch konform sind
 const getAccordionTitle = <T extends string>(fields: Fields<T>, column: Column<T>, translations: Translations) => {
   const fieldLabel = fields.find((field) => "value" in column && field.key === column.value)!.label
   return `${translations.matchColumnsStep.matchDropdownTitle} ${fieldLabel} (${
@@ -69,6 +72,8 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
 
   const handleFormSubmit = (inputValue: Field<string>) => {
     setSavedInput(inputValue)
+    localStorage.removeItem("fieldsList")
+    localStorage.setItem("fieldsList", JSON.stringify(getFields()))
   }
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -88,14 +93,28 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
   const addMissingFieldsFromHeader = (fields: Fields<string>, setFieldsFn: (field: Field<string>) => void) => {
     const schemaUsed = localStorage.getItem("schemaUsed")
     if (schemaUsed === "false") {
+      console.log("ADdMissingFieldsFromHeader")
       const header = column.header
       if (fields === undefined) {
         return null
       } else {
         const key = fields.find((f) => f.key === header)
         if (key === undefined) {
+          const headerWithoutUnderscore = header.replace(/_/g, " ")
+          const headerInLowerCase = headerWithoutUnderscore.toLowerCase()
+          const headerInUpperCase = headerInLowerCase.charAt(0).toUpperCase() + headerInLowerCase.slice(1)
+          const headerInUpperCaseWithRest = headerInUpperCase + headerInLowerCase.slice(1)
+          const headerInUpperCaseWithRestAndSpaces = headerInUpperCaseWithRest.replace(/ /g, "")
+
           const fieldToAdd: Field<string> = {
-            alternateMatches: [header],
+            alternateMatches: [
+              header,
+              headerWithoutUnderscore,
+              headerInLowerCase,
+              headerInUpperCase,
+              headerInUpperCaseWithRest,
+              headerInUpperCaseWithRestAndSpaces,
+            ],
             description: "This field element is automatically generated",
             example: "",
             fieldType: {
@@ -110,8 +129,27 @@ export const TemplateColumn = <T extends string>({ column, onChange, onSubChange
           // do nothing, key exists.
         }
       }
-      const allFields = useRsi().getFields()
-      localStorage.setItem("fieldsList", JSON.stringify(allFields.toString()))
+      const allFields = getFields()
+
+      // Check if "id" field exists
+      const idField = allFields.find((f) => f.key === "id")
+      if (!idField) {
+        const idFieldToAdd: Field<string> = {
+          alternateMatches: ["id"],
+          description: "This id field is automatically generated",
+          example: "",
+          fieldType: {
+            type: "input",
+          },
+          key: "id",
+          label: "id",
+          validations: [],
+        }
+        setFieldsFn(idFieldToAdd)
+      }
+
+      const allFieldsNew = getFields()
+      localStorage.setItem("fieldsList", JSON.stringify(allFieldsNew))
     }
   }
 
