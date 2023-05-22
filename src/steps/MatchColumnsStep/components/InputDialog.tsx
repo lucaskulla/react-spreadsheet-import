@@ -16,8 +16,8 @@ import {
   Textarea,
   useStyleConfig,
 } from "@chakra-ui/react"
-import Form from "@rjsf/core"
-import React from "react"
+import Form, { IChangeEvent } from "@rjsf/core"
+import React, { FormEvent } from "react"
 import type { themeOverrides } from "../../../theme"
 import type { Column } from "../MatchColumnsStep"
 import { useRsi } from "../../../hooks/useRsi"
@@ -25,6 +25,7 @@ import ReactSelect from "react-select"
 import validator from "@rjsf/validator-ajv8"
 import type { RJSFSchema } from "@rjsf/utils"
 import type { Field } from "../../../types"
+import type { MultiValue } from "chakra-react-select"
 
 //TODO Ende Validierung
 //TODO Post der Daten ggf. 5 Seite erstellen
@@ -122,10 +123,14 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     fieldType?: { type: string } | string
   }
 
-  const handleSubmit = ({ formData }: { formData: MyFormData }) => {
-    //This if is need because officially FieldType is an array, however, in the schema above it is just an enum, because it is easier to display. Here is the array created
-    if (typeof formData.fieldType === "string") {
-      formData.fieldType = { type: formData.fieldType }
+  const handleSubmit = (data: IChangeEvent<MyFormData, RJSFSchema, any>, event: FormEvent<any>) => {
+    const { formData } = data
+
+    //This if is needed because officially FieldType is an array, however, in the schema above it is just an enum, because it is easier to display. Here is the array created
+    if (formData) {
+      if (typeof formData.fieldType === "string") {
+        formData.fieldType = { type: formData.fieldType }
+      }
     }
 
     const f = formData as unknown as Field<string>
@@ -134,6 +139,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     onSubmit(f)
     onClose()
   }
+
   const [scrollBehavior, setScrollBehavior] = React.useState("inside")
   const btnRef = React.useRef(null)
 
@@ -199,8 +205,9 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
       value.map((val: { label: any; value: any }) => ({ value: val, label: val })),
     )
 
-    const handleTagsChange = (selectedOptions: { value: any }[]) => {
-      onChange(selectedOptions.map((option: { value: any }) => option.value))
+    const handleTagsChange = (selectedOptions: MultiValue<any>) => {
+      const updatedOptions = selectedOptions.map((option) => ({ value: option.value, label: option.value }))
+      onChange(updatedOptions)
     }
 
     const handleInputChange = (inputValue: React.SetStateAction<string>) => {
@@ -429,7 +436,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
               schema={schemaField}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
-              formData={createNewField ? "" : getSpecificField(column?.value)}
+              formData={createNewField ? "" : getSpecificField(column.value)}
               validator={validator}
             >
               <Button type="submit">save</Button>
