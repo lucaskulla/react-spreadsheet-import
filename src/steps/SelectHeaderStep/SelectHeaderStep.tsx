@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react"
-import { Heading, ModalBody, useStyleConfig, Box } from "@chakra-ui/react"
+import { Box, Heading, ModalBody, useStyleConfig } from "@chakra-ui/react"
 import { SelectHeaderTable } from "./components/SelectHeaderTable"
 import { ContinueButton } from "../../components/ContinueButton"
 import { useRsi } from "../../hooks/useRsi"
@@ -20,6 +20,7 @@ export const SelectHeaderStep = ({ data, onContinue }: SelectHeaderProps) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleContinue = useCallback(async () => {
+    // @ts-ignore
     const [selectedRowIndex] = selectedRows
     // We consider data above header to be redundant
     const trimmedData = data.slice(selectedRowIndex + 1)

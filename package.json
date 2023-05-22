@@ -12,8 +12,6 @@
   ],
   "scripts": {
     "start": "start-storybook -p 6006",
-    "start2": "DISABLE_ESLINT_PLUGIN=true PORT=3006 react-scripts start",
-    "build2": "react-scripts build",
     "test": "jest",
     "ts": "tsc",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",

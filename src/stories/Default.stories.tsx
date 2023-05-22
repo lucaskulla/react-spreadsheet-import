@@ -90,11 +90,11 @@ export const Basic = () => {
         // Send a POST request for each item
         apiClient
           .post("/object/" + urn, item, { params: { skip_validation: false } })
-          .then((response) => {
+          .then((response: any) => {
             console.log(`Data uploaded successfully for item: ${JSON.stringify(item)}`)
             console.log(response)
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error(`Error occurred while uploading data for item: ${JSON.stringify(item)}`)
             console.error(error)
           })
@@ -123,8 +123,8 @@ export const Basic = () => {
       //setPreviewSchema(conversion)
       apiClient
         .post("/schema", conversion)
-        .then((r) => console.log("r"))
-        .catch((e) => {
+        .then((r: any) => console.log(r))
+        .catch((e: { message: string }) => {
           const errorMessage = e.message || "An unexpected error occurred"
           errorToast(errorMessage)
         })
