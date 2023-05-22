@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom"
-import { render, waitFor, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import { ValidationStep } from "../ValidationStep"
 import { defaultRSIProps, defaultTheme } from "../../../ReactSpreadsheetImport"
 import { Providers } from "../../../components/Providers"
@@ -23,6 +23,7 @@ describe("Validation step tests", () => {
   test("Submit data", async () => {
     const onSubmit = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, onSubmit: onSubmit }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={[]} />
@@ -67,6 +68,7 @@ describe("Validation step tests", () => {
       },
     ] as const
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -121,6 +123,7 @@ describe("Validation step tests", () => {
 
     const onSubmit = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields, onSubmit }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -195,6 +198,7 @@ describe("Validation step tests", () => {
       },
     ] as const
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -242,6 +246,7 @@ describe("Validation step tests", () => {
       },
     ] as const
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -286,6 +291,7 @@ describe("Validation step tests", () => {
       },
     ] as const
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -343,6 +349,7 @@ describe("Validation step tests", () => {
       },
     ] as const
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <ValidationStep initialData={initialData} />
@@ -426,6 +433,7 @@ describe("Validation step tests", () => {
         theme={defaultTheme}
         rsiValues={{
           ...mockValues,
+          // @ts-ignore
           fields,
         }}
       >
@@ -581,6 +589,7 @@ describe("Validation step tests", () => {
         theme={defaultTheme}
         rsiValues={{
           ...mockValues,
+          // @ts-ignore
           fields,
           rowHook: (value) => ({
             name: value.name?.toString()?.split(/(\s+)/)[0],
@@ -640,6 +649,7 @@ describe("Validation step tests", () => {
         theme={defaultTheme}
         rsiValues={{
           ...mockValues,
+          // @ts-ignore
           fields,
           rowHook: (value, setError) => {
             if (value.name === WRONG_NAME) {
@@ -704,6 +714,7 @@ describe("Validation step tests", () => {
         theme={defaultTheme}
         rsiValues={{
           ...mockValues,
+          // @ts-ignore
           fields,
           tableHook: (data) =>
             data.map((value) => ({
@@ -756,12 +767,12 @@ describe("Validation step tests", () => {
         },
       },
     ] as const
-
     render(
       <Providers
         theme={defaultTheme}
         rsiValues={{
           ...mockValues,
+          // @ts-ignore
           fields,
           tableHook: (data, setError) => {
             data.forEach((value, index) => {

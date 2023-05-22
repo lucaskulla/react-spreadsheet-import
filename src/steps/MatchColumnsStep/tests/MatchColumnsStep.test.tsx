@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom"
-import { render, waitFor, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import { MatchColumnsStep } from "../MatchColumnsStep"
 import { defaultTheme, ReactSpreadsheetImport } from "../../../ReactSpreadsheetImport"
 import { mockRsiValues } from "../../../stories/mockRsiValues"
@@ -161,6 +161,7 @@ describe("Match Columns automatic matching", () => {
 
     const onContinue = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockRsiValues, fields: alternativeFields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <MatchColumnsStep headerValues={header} data={data} onContinue={onContinue} />
@@ -240,6 +241,7 @@ describe("Match Columns automatic matching", () => {
 
     const onContinue = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockRsiValues, fields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <MatchColumnsStep headerValues={header} data={data} onContinue={onContinue} />
@@ -439,6 +441,7 @@ describe("Match Columns general tests", () => {
 
     const onContinue = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockRsiValues, fields: enumFields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <MatchColumnsStep headerValues={header} data={data} onContinue={onContinue} />
@@ -530,6 +533,7 @@ describe("Match Columns general tests", () => {
 
     const onContinue = jest.fn()
     render(
+      // @ts-ignore
       <Providers theme={defaultTheme} rsiValues={{ ...mockRsiValues, fields: requiredFields }}>
         <ModalWrapper isOpen={true} onClose={() => {}}>
           <MatchColumnsStep headerValues={header} data={data} onContinue={onContinue} />
@@ -589,6 +593,7 @@ describe("Match Columns general tests", () => {
     const matchColumnsStepHook = jest.fn(async (values) => values)
     const mockValues = {
       ...mockRsiValues,
+      // @ts-ignore
       fields: mockRsiValues.fields.filter((field) => field.key === "name" || field.key === "age"),
     }
     render(
@@ -621,6 +626,7 @@ describe("Match Columns general tests", () => {
     })
     const mockValues = {
       ...mockRsiValues,
+      // @ts-ignore
       fields: mockRsiValues.fields.filter((field) => field.key === "name" || field.key === "age"),
     }
     render(
@@ -654,6 +660,7 @@ describe("Match Columns general tests", () => {
 
     const mockValues = {
       ...mockRsiValues,
+      // @ts-ignore
       fields: mockRsiValues.fields.filter((field) => field.key === "name" || field.key === "age"),
     }
 

@@ -39,14 +39,6 @@ interface ModalProps {
 }
 
 interface ValidationEditorProps {
-  index: null
-}
-
-interface ValidationEditorProps {
-  index: null
-}
-
-interface ValidationEditorProps {
   index: React.Key | null | undefined
 }
 
@@ -274,11 +266,18 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     return (
       <FormControl id={id}>
         <Select value={value || ""} onChange={handleChange} onBlur={handleBlur} onFocus={handleFocus}>
-          {options.enumOptions.map(({ value, label }, index) => (
-            <option key={index} value={value}>
-              {label}
-            </option>
-          ))}
+          {options.enumOptions.map(
+            (
+              // @ts-ignore
+              { value, label },
+              // @ts-ignore
+              index,
+            ) => (
+              <option key={index} value={value}>
+                {label}
+              </option>
+            ),
+          )}
         </Select>
       </FormControl>
     )
@@ -319,8 +318,15 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
     )
   }
 
-  const ValidationEditor = (props: { validation: any; onChange: any }) => {
-    const { validation, onChange } = props
+  const ValidationEditor = ({
+    index,
+    validation,
+    onChange,
+  }: {
+    index: React.Key | null | undefined
+    validation: any
+    onChange: (updatedValidation: any) => void
+  }) => {
     const [currentValidation, setCurrentValidation] = React.useState(validation)
 
     const handleFieldChange = (field: string, value: string | boolean) => {
@@ -426,7 +432,12 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} scrollBehavior={scrollBehavior}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        // @ts-ignore
+        scrollBehavior={scrollBehavior}
+      >
         <Heading {...styles.heading}></Heading>
         <ModalOverlay />
         <ModalContent {...styles.userTable}>
@@ -436,6 +447,7 @@ const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChec
               schema={schemaField}
               uiSchema={uiSchema}
               onSubmit={handleSubmit}
+              // @ts-ignore
               formData={createNewField ? "" : getSpecificField(column.value)}
               validator={validator}
             >
