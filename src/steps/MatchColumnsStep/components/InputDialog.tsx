@@ -43,7 +43,7 @@ interface ValidationEditorProps {
 }
 
 const ModalAddField: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, isChecked, column }) => {
-  const { getSpecificField, addField } = useRsi()
+  const { getSpecificField, addField, getFields } = useRsi()
 
   const [createNewField, setCreateNewField] = React.useState(false)
 
